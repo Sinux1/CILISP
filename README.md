@@ -1,7 +1,8 @@
 ## CiLisp
 ### Summary
 #### Task 1 ::= CPN Calculator  
-In this task, I first extended the `ciLisp.l` file to define a DOUBLE and completed the definition for FUNC. 
+In this task, I first extended the `ciLisp.l` file to define a DOUBLE and completed the definition for FUNC.  
+
 Summarize what has been done so far. Specify which tasks have been completed so far.
 ### Sample Runs
 Sample runs should all come from the most recent implementation. Sample runs which were done to test previous tasks should be done again with the new implementation.
