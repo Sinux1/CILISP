@@ -48,6 +48,9 @@ typedef enum oper {
     CUSTOM_OPER
 } OPER_TYPE;
 
+// My function eval function signatures
+double neg(double);
+double
 OPER_TYPE resolveFunc(char *);
 
 // Types of numeric values

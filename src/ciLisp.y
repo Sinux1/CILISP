@@ -7,7 +7,7 @@
     double dval;
     char *sval;
     struct ast_node *astNode;
-};
+}
 
 %token <sval> FUNC
 %token <dval> INT DOUBLE
@@ -42,7 +42,8 @@ s_expr:
         $$ = $1;
     }
     | f_expr {
-
+    	ylog(s_expr, f_expr);
+    	$$ = $1;
     }
     | QUIT {
         ylog(s_expr, QUIT);
@@ -56,18 +57,30 @@ s_expr:
 
 number:
     INT {
-
+	ylog(number, INT);
+	$$ = createNumberNode($1, INT_TYPE);
+    }
+    |
+    DOUBLE {
+	ylog(number, DOUBLE);
+        $$ = createNumberNode($1, DOUBLE_TYPE);
     };
 
 f_expr:
     LPAREN FUNC s_expr_list RPAREN {
-        
+    	ylog(f_expr, FUNC);
+	$$ = createFunctionNode($2, $3);
     };
 
 s_expr_list:
     s_expr {
         ylog(s_expr_list, s_expr);
         $$ = $1;
+    }
+    |
+    s_expr s_expr_list {
+    	ylog(s_expr_list, s_expr_list);
+    	$$ = addOperandToList($1, $2);
     };
 %%
 

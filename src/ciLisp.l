@@ -10,7 +10,7 @@
 
 digit [0-9]
 int [+-]?{digit}+
-dbl {int}\.{digit}+
+dbl [+-]?{digit}+\.{digit}+
 func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"sqrt"|"cbrt"|"hypot"|"max"|"min"|"print"|"read"|"equal"|"less"|"greater"
 
 %%
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     // Comment the line below to type inputs directly into the console.
     // Otherwise, they will be read from the file specified in the first program argument.
-    freopen(argv[1], "r", stdin); input_from_file = 1;
+    //freopen(argv[1], "r", stdin); input_from_file = 1;
 
     while(1) {
         if (!input_from_file)

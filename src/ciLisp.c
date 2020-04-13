@@ -65,6 +65,9 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
         yyerror("Memory allocation failed!");
 
     // TODO set the AST_NODE's type, assign values to contained NUM_AST_NODE
+    node->type = NUM_NODE_TYPE;
+    node->data.number.type = type;
+    node->data.number.value = value;
 
     return node;
 }
@@ -79,6 +82,12 @@ AST_NODE *createNumberNode(double value, NUM_TYPE type)
 AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList)
 {
     // TODO allocate space for the node being created.
+    AST_NODE *node;
+    size_t nodeSize;
+    nodeSize = sizeof(AST_NODE);
+    if ((node = calloc(nodeSize, 1)) == NULL)
+        yyerror("Memory allocation failed!");
+
 
     // TODO set the AST_NODE's type, populate contained FUNC_AST_NODE
     // NOTE: you do not need to populate the "ident" field unless the function is type CUSTOM_OPER.
@@ -87,7 +96,20 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList)
     // For CUSTOM_OPER functions, you should simply assign the "ident" pointer to the passed in funcName.
     // For functions other than CUSTOM_OPER, you should free the funcName after you've assigned the OPER_TYPE.
 
-    return NULL;
+    // Sets type
+    node->type = FUNC_NODE_TYPE;
+    // Assign reference to oplist
+    node->data.function.opList = opList;
+    // Assign function operation, using assignment return value to test if custom op,
+    // assigning ident if it is and returning node.
+    if((node->data.function.oper = resolveFunc(funcName)) == CUSTOM_OPER)
+    {
+        node->data.function.ident = funcName;
+        return node;
+    }
+    // If not custom op, free funcName
+    free(funcName);
+    return node;
 }
 
 
@@ -98,7 +120,10 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList)
 AST_NODE *addOperandToList(AST_NODE *newHead, AST_NODE *list)
 {
     // TODO
-    return NULL;
+    // Point the new head at the old head (list)
+    newHead->next = list;
+    // return the newHead
+    return newHead;
 }
 
 
@@ -115,6 +140,8 @@ RET_VAL evalNumNode(AST_NODE *node)
 
     // TODO populate result with the values stored in the node.
     // SEE: AST_NODE, AST_NODE_TYPE, NUM_AST_NODE
+    result.value = node->data.number.value;
+    result.type = node->data.number.type;
     return result;
 }
 
@@ -138,7 +165,57 @@ RET_VAL evalFuncNode(AST_NODE *node)
 
     // TODO populate result with the result of running the function on its operands.
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
-
+    switch(node->data.function.oper){
+        case NEG_OPER:
+            neg_op();
+            break;
+        case ABS_OPER:
+            abs_op();
+            break;
+        case ADD_OPER:
+            add_op();
+            break;
+        case SUB_OPER:
+            sub_op();
+            break;
+        case MULT_OPER:
+            mult_op();
+            break;
+        case DIV_OPER:
+            div_op();
+        case REMAINDER_OPER:
+            remaind_op();
+            break;
+        case EXP_OPER:
+            exp_op();
+            break;
+        case EXP2_OPER:
+            exp2_op();
+            break;
+        case POW_OPER:
+            pow_op();
+            break;
+        case LOG_OPER:
+            log_op();
+            break;
+        case SQRT_OPER:
+            sqrt_op();
+            break;
+        case CBRT_OPER:
+            cbrt_op();
+            break;
+        case HYPOT_OPER:
+            hypot_op();
+            break;
+        case MAX_OPER:
+            max_op();
+            break;
+        case MIN_OPER:
+            min_op();
+            break;
+        default:
+            puts("This error is in evalFuncNode()");
+    }
 
     return result;
 }
@@ -159,6 +236,12 @@ RET_VAL eval(AST_NODE *node)
     // Use the results of those calls to populate result.
     switch (node->type)
     {
+        case NUM_NODE_TYPE:
+            evalNumNode(node);
+            break;
+        case FUNC_NODE_TYPE:
+            evalFuncNode(node);
+            break;
         default:
             yyerror("Invalid AST_NODE_TYPE, probably invalid writes somewhere!");
     }
@@ -171,6 +254,8 @@ RET_VAL eval(AST_NODE *node)
 void printRetVal(RET_VAL val)
 {
     // TODO print the type and value of the value passed in.
+    printf("TYPE: %s VALUE: %lf\n", (val.type)? "INTEGER": "DOUBLE", val.value);
+
 }
 
 
@@ -186,11 +271,18 @@ void freeNode(AST_NODE *node)
         return;
 
     // TODO if the node's next pointer isn't NULL,
-        // make a recursive call to free it
+    if(node->next != NULL)
+    {
+        freeNode(node->next);
+    }
 
     // TODO:
     // if the node is a function node:
+    if(node->type == FUNC_NODE_TYPE)
+    {
         // make a recursive call to free its opList
+        freeNode(node->data.function.opList);
+    }
 
     free(node);
 }
