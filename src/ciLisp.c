@@ -167,51 +167,51 @@ RET_VAL evalFuncNode(AST_NODE *node)
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
     switch(node->data.function.oper){
         case NEG_OPER:
-            neg_op();
+            result = neg_op(*node->data.function.opList);
             break;
         case ABS_OPER:
-            abs_op();
+            result = abs_op(*node->data.function.opList);
             break;
         case ADD_OPER:
-            add_op();
+            result = add_op(*node->data.function.opList);
             break;
         case SUB_OPER:
-            sub_op();
+            result = sub_op(*node->data.function.opList);
             break;
         case MULT_OPER:
-            mult_op();
+            result = mult_op(*node->data.function.opList);
             break;
         case DIV_OPER:
-            div_op();
+            result = div_op(*node->data.function.opList);
         case REMAINDER_OPER:
-            remaind_op();
+            result = remaind_op(*node->data.function.opList);
             break;
         case EXP_OPER:
-            exp_op();
+            result = exp_op(*node->data.function.opList);
             break;
         case EXP2_OPER:
-            exp2_op();
+            result = exp2_op(*node->data.function.opList);
             break;
         case POW_OPER:
-            pow_op();
+            result = pow_op(*node->data.function.opList);
             break;
         case LOG_OPER:
-            log_op();
+            result = log_op(*node->data.function.opList);
             break;
         case SQRT_OPER:
-            sqrt_op();
+            result = sqrt_op(*node->data.function.opList);
             break;
         case CBRT_OPER:
-            cbrt_op();
+            result = cbrt_op(*node->data.function.opList);
             break;
         case HYPOT_OPER:
-            hypot_op();
+            result = hypot_op(*node->data.function.opList);
             break;
         case MAX_OPER:
-            max_op();
+            result = max_op(*node->data.function.opList);
             break;
         case MIN_OPER:
-            min_op();
+            result = min_op(*node->data.function.opList);
             break;
         default:
             puts("This error is in evalFuncNode()");
@@ -285,4 +285,84 @@ void freeNode(AST_NODE *node)
     }
 
     free(node);
+}
+
+RET_VAL neg_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL abs_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL add_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL sub_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL mult_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL div_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL remaind_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL exp_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL exp2_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL pow_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL log_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL sqrt_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL cbrt_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL hypot_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL max_op(AST_NODE) {
+    RET_VAL result;
+    return result;
+}
+
+RET_VAL min_op(AST_NODE) {
+    RET_VAL result;
+    return result;
 }

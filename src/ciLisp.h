@@ -48,9 +48,7 @@ typedef enum oper {
     CUSTOM_OPER
 } OPER_TYPE;
 
-// My function eval function signatures
-double neg(double);
-double
+
 OPER_TYPE resolveFunc(char *);
 
 // Types of numeric values
@@ -108,4 +106,21 @@ void printRetVal(RET_VAL val);
 
 void freeNode(AST_NODE *node);
 
+// My function eval function signatures
+RET_VAL neg_op(AST_NODE);
+RET_VAL abs_op(AST_NODE);
+RET_VAL add_op(AST_NODE);
+RET_VAL sub_op(AST_NODE);
+RET_VAL mult_op(AST_NODE);
+RET_VAL div_op(AST_NODE);
+RET_VAL remaind_op(AST_NODE);
+RET_VAL exp_op(AST_NODE);
+RET_VAL exp2_op(AST_NODE);
+RET_VAL pow_op(AST_NODE);
+RET_VAL log_op(AST_NODE);
+RET_VAL sqrt_op(AST_NODE);
+RET_VAL cbrt_op(AST_NODE);
+RET_VAL hypot_op(AST_NODE);
+RET_VAL max_op(AST_NODE);
+RET_VAL min_op(AST_NODE);
 #endif
