@@ -1,8 +1,10 @@
 ## CiLisp
 ### Summary
+This is the first task. It required completing both the lex and yacc files, as well as eval functions for the grammar of  
+a lisp like language for evaluating expressions in CNP form.
 #### Task 1 ::= CPN Calculator  
-In this task, I first extended the `ciLisp.l` file to define a DOUBLE and completed the definition for FUNC.  
-
+**noteable**:  
+For the NEG operation, I had to add a production for _s_expr_list_ to handle the instance when no operand is provided.   
 Summarize what has been done so far. Specify which tasks have been completed so far.
 ### Sample Runs
 Sample runs should all come from the most recent implementation. Sample runs which were done to test previous tasks should be done again with the new implementation.

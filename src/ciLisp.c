@@ -167,7 +167,7 @@ RET_VAL evalFuncNode(AST_NODE *node)
     // SEE: AST_NODE, AST_NODE_TYPE, FUNC_AST_NODE
     switch(node->data.function.oper){
         case NEG_OPER:
-            result = neg_op(*node->data.function.opList);
+            result = neg_op(node->data.function.opList);
             break;
         case ABS_OPER:
             result = abs_op(*node->data.function.opList);
@@ -254,7 +254,12 @@ RET_VAL eval(AST_NODE *node)
 void printRetVal(RET_VAL val)
 {
     // TODO print the type and value of the value passed in.
-    printf("TYPE: %s VALUE: %lf\n", (val.type)? "INTEGER": "DOUBLE", val.value);
+    if(val.type == INT_TYPE)
+    {
+        // Interesting that the example calls for integer when NAN type is a double!?
+        printf("INTEGER: %lf\n", val.value);
+    }
+
 
 }
 
@@ -287,82 +292,89 @@ void freeNode(AST_NODE *node)
     free(node);
 }
 
-RET_VAL neg_op(AST_NODE) {
+RET_VAL neg_op(AST_NODE *oplist) {
+    RET_VAL result;
+    if(oplist == NULL){
+        puts( "ERROR: neg called with no operands!");
+        result.value = NAN;
+        result.type = INT_TYPE;
+    }
+
+
+    return result;
+}
+
+RET_VAL abs_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL abs_op(AST_NODE) {
+RET_VAL add_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL add_op(AST_NODE) {
+RET_VAL sub_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL sub_op(AST_NODE) {
+RET_VAL mult_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL mult_op(AST_NODE) {
+RET_VAL div_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL div_op(AST_NODE) {
+RET_VAL remaind_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL remaind_op(AST_NODE) {
+RET_VAL exp_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL exp_op(AST_NODE) {
+RET_VAL exp2_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL exp2_op(AST_NODE) {
+RET_VAL pow_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL pow_op(AST_NODE) {
+RET_VAL log_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL log_op(AST_NODE) {
+RET_VAL sqrt_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL sqrt_op(AST_NODE) {
+RET_VAL cbrt_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL cbrt_op(AST_NODE) {
+RET_VAL hypot_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL hypot_op(AST_NODE) {
+RET_VAL max_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }
 
-RET_VAL max_op(AST_NODE) {
-    RET_VAL result;
-    return result;
-}
-
-RET_VAL min_op(AST_NODE) {
+RET_VAL min_op(AST_NODE oplist) {
     RET_VAL result;
     return result;
 }

@@ -81,6 +81,10 @@ s_expr_list:
     s_expr s_expr_list {
     	ylog(s_expr_list, s_expr_list);
     	$$ = addOperandToList($1, $2);
+    }
+
+    |{
+    	$$ = NULL;
     };
 %%
 

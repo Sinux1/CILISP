@@ -107,7 +107,7 @@ void printRetVal(RET_VAL val);
 void freeNode(AST_NODE *node);
 
 // My function eval function signatures
-RET_VAL neg_op(AST_NODE);
+RET_VAL neg_op(AST_NODE*);
 RET_VAL abs_op(AST_NODE);
 RET_VAL add_op(AST_NODE);
 RET_VAL sub_op(AST_NODE);
