@@ -246,7 +246,10 @@ void printRetVal(RET_VAL val) {
     // TODO print the type and value of the value passed in.
     if (isnan(val.value)) {
         // Interesting that the example calls for integer when NAN type is a double!?
-        printf("INTEGER: %lf\n", val.value);
+        // To match example output for task, where there were no -nan values, I
+        // kept getting -nan when op1 was < 0 and op2 is finite non integer,
+        // so I explicitly passed NAN to printf.
+        printf("INTEGER: %lf\n", NAN);
     } else if (val.type == INT_TYPE) {
         // Casting to type int from double
         printf("INTEGER: %d\n", (int) val.value);
@@ -420,8 +423,8 @@ RET_VAL div_op(AST_NODE *oplist) {
     // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
     // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
     result.type = (op1.type || op2.type) ? DOUBLE_TYPE : INT_TYPE;
-    result.value = (op2.value) ? op1.value / op2.value
-                               : NAN;
+    if (isnan(result.value = (op2.value) ? op1.value / op2.value : NAN))
+        puts("Division by zero error");
     return result;
 }
 
@@ -437,19 +440,20 @@ RET_VAL remaind_op(AST_NODE *oplist) {
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
-    } else if (oplist->next != NULL) {
-        if (oplist->next->next != NULL) {
-            puts("WARNING: remainder called with extra (ignored) operands!");
-        }
-        // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
-        // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
-        // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (oplist->data.number.type || oplist->next->data.number.type) ? DOUBLE_TYPE : INT_TYPE;
-        result.value = remainder(oplist->data.number.value, oplist->next->data.number.value);
-        if (result.value < 0) {
-            result.value = oplist->next->data.number.value + result.value;
-        }
     }
+    RET_VAL op1 = eval(oplist), op2 = eval(oplist->next);
+    if (oplist->next->next != NULL) {
+        puts("WARNING: remainder called with extra (ignored) operands!");
+    }
+    // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
+    // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
+    // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
+    result.type = (op1.type || op2.type) ? DOUBLE_TYPE : INT_TYPE;
+    result.value = remainder(op1.value, op2.value);
+    if (result.value < 0) {
+        result.value += op2.value;
+    }
+
     return result;
 }
 
@@ -461,55 +465,140 @@ RET_VAL exp_op(AST_NODE *oplist) {
         result.value = NAN;
         return result;
     }
+    RET_VAL op1 = eval(oplist);
     if (oplist->next != NULL) {
         puts("WARNING: exp called with extra (ignored) operands!");
     }
     result.type = DOUBLE_TYPE;
-    result.value = exp(oplist->data.number.value);
+    result.value = exp(op1.value);
     return result;
 }
 
 RET_VAL exp2_op(AST_NODE *oplist) {
     RET_VAL result;
-    RET_VAL operand = eval(oplist);
     if (oplist == NULL) {
         puts("ERROR: exp2 called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
+
+    RET_VAL op1 = eval(oplist);
     if (oplist->next != NULL) {
         puts("WARNING: exp2 called with extra (ignored) operands!");
     }
-    // Ternary operator. If operand is positive and INT, return INT type, otherwise returns DOUBLE type
-    result.type = (operand.value >= 0 && operand.type == INT_TYPE) ? INT_TYPE : DOUBLE_TYPE;
-    result.value = pow(2, operand.value);
+    // Ternary operator. If op1 is positive and INT, return INT type, otherwise returns DOUBLE type
+    result.type = (op1.value >= 0 && op1.type == INT_TYPE) ? INT_TYPE : DOUBLE_TYPE;
+    result.value = pow(2, op1.value);
 
     return result;
 }
 
 RET_VAL pow_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op1, op2;
+    if (oplist == NULL) {
+        puts("ERROR: pow called with no operands!");
+        result.type == INT_TYPE;
+        result.value = NAN;
+        return result;
+    } else if (oplist->next == NULL) {
+        puts("ERROR: pow called with only one arg!");
+        result.type = INT_TYPE;
+        result.value = NAN;
+        return result;
+    }
+    op1 = eval(oplist), op2 = eval(oplist->next);
+    if (oplist->next->next != NULL) {
+        puts("WARNING: pow called with extra (ignored) operands!");
+    }
+    result.type = (op1.type || op2.type) ? DOUBLE_TYPE
+                                         : INT_TYPE;
+    result.value = pow(op1.value, op2.value);
     return result;
 }
 
 RET_VAL log_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op1;
+    if(oplist == NULL)
+    {
+        puts("ERROR: log called with no operands!");
+        result.type = INT_TYPE;
+        result.value = NAN;
+        return result;
+    }
+    op1 = eval(oplist);
+    if(oplist->next != NULL){
+        puts("WARNING: log called with extra (ignored) operands!");
+    }
+    result.type = DOUBLE_TYPE;
+    result.value = log(op1.value);
     return result;
 }
 
 RET_VAL sqrt_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op1;
+    if(oplist == NULL)
+    {
+        puts("ERROR: sqrt called with no operands!");
+        result.type = INT_TYPE;
+        result.value = NAN;
+        return result;
+    }
+    op1 = eval(oplist);
+    if(oplist->next != NULL)
+    {
+        puts("WARNING: sqrt called with extra (ignored) operands!");
+    }
+    result.type = DOUBLE_TYPE;
+    result.value = sqrt(op1.value);
     return result;
 }
 
 RET_VAL cbrt_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op1;
+    if(oplist == NULL)
+    {
+        puts("ERROR: cbrt called with no operands!");
+        result.type = INT_TYPE;
+        result.value = NAN;
+        return result;
+    }
+    op1 = eval(oplist);
+    if(oplist->next != NULL)
+    {
+        puts("WARNING: cbrt called with extra (ignored) operands!");
+    }
+    result.type = DOUBLE_TYPE;
+    result.value = cbrt(op1.value);
     return result;
 }
 
 RET_VAL hypot_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op1;
+    if(oplist == NULL)
+    {
+        puts("ERROR: hypot called with no operands, 0.0 returned!");
+        result.type = DOUBLE_TYPE;
+        result.value = 0;
+        return result;
+    }
+
+    AST_NODE *nextop = oplist;
+    op1 = eval(nextop);
+    int soq = op1.value * op1.value;
+    while(nextop->next != NULL)
+    {
+        nextop = nextop->next;
+        op1 = eval(nextop);
+        soq += op1.value * op1.value;
+    }
+    result.type = DOUBLE_TYPE;
+    result.value = sqrt(soq);
     return result;
 }
 
