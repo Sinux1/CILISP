@@ -44,7 +44,7 @@ func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"
     }
 
 \)  {
-    llog(LPAREN)
+    llog(RPAREN)
     return RPAREN;
     }
 
@@ -52,7 +52,6 @@ func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"
 
 [\n] {
     llog(EOL);
-    YY_FLUSH_BUFFER;
     return EOL;
     }
 
@@ -61,7 +60,7 @@ func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"
     return EOFT;
     }
 
-[ \t] ; /* skip whitespace */
+[ \t\v\r] ; /* skip whitespace */
 
 
 . { // anything else

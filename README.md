@@ -1,10 +1,16 @@
 ## CiLisp
 ### Summary
-This is the first task. It required completing both the lex and yacc files, as well as eval functions for the grammar of  
-a lisp like language for evaluating expressions in CNP form.
+This is the first task. It required completing both the lex and yacc files, as well as eval functions for the grammar of a lisp like language for evaluating expressions in CNP form.
 #### Task 1 ::= CPN Calculator  
 **noteable**:  
-For the NEG operation, I had to add a production for _s_expr_list_ to handle the instance when no operand is provided.   
+For the NEG operation, I had to add a production for _s_expr_list_ to handle the instance when no operand is provided. I suspect it is necessary for all ops.  
+Added \v and \r to the lex file for ignoring whitespace.  
+For add_op, used recursion to sum the oplist.  
+Called freeNode($1) after execution is done on base of tree, to free memory and satisfy the Valgring monster.  
+I use ternary operators wherever (appropriately) possible and, for example, in conditionals when differentiating enumerated types, I take advantage of the fact that enumerated types resolve to integer values, and that integer values  are interpreted as true or false values. I do this when determining the RET_VAL type from NUM_AST_NODE types.  
+For division by 0, I have chosen to return nan without throwing an error or warning. nan is enough of a warning.  
+ 
+      
 Summarize what has been done so far. Specify which tasks have been completed so far.
 ### Sample Runs
 Sample runs should all come from the most recent implementation. Sample runs which were done to test previous tasks should be done again with the new implementation.

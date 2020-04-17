@@ -22,6 +22,7 @@ program:
         ylog(program, s_expr EOL);
         if ($1) {
             printRetVal(eval($1));
+            freeNode($1);
             YYACCEPT;
         }
     }

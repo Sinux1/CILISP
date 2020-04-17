@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.2)
 project(cilisp)
 
 #Creating an executable
-add_executable(cilisp src/ciLisp.c src/ciLisp.h)
+add_executable(cilisp src/ciLisp.c src/ciLisp.h )
 
 #Forcing all compilation to be with C11 Standard
 set_property(TARGET cilisp PROPERTY C_STANDARD 11)

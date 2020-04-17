@@ -12,7 +12,7 @@
 
 #define DEFAULT_RET_VAL (RET_VAL){INT_TYPE, NAN}
 
-FILE* flex_bison_log_file;
+FILE *flex_bison_log_file;
 
 int yyparse(void);
 
@@ -96,6 +96,7 @@ typedef struct ast_node {
 
 
 AST_NODE *createNumberNode(double value, NUM_TYPE type);
+
 AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList);
 
 AST_NODE *addOperandToList(AST_NODE *newHead, AST_NODE *list);
@@ -105,22 +106,36 @@ RET_VAL eval(AST_NODE *node);
 void printRetVal(RET_VAL val);
 
 void freeNode(AST_NODE *node);
+RET_VAL neg_op(AST_NODE *);
 
-// My function eval function signatures
-RET_VAL neg_op(AST_NODE*);
-RET_VAL abs_op(AST_NODE);
-RET_VAL add_op(AST_NODE);
-RET_VAL sub_op(AST_NODE);
-RET_VAL mult_op(AST_NODE);
-RET_VAL div_op(AST_NODE);
-RET_VAL remaind_op(AST_NODE);
-RET_VAL exp_op(AST_NODE);
-RET_VAL exp2_op(AST_NODE);
-RET_VAL pow_op(AST_NODE);
-RET_VAL log_op(AST_NODE);
-RET_VAL sqrt_op(AST_NODE);
-RET_VAL cbrt_op(AST_NODE);
-RET_VAL hypot_op(AST_NODE);
-RET_VAL max_op(AST_NODE);
-RET_VAL min_op(AST_NODE);
+RET_VAL abs_op(AST_NODE*);
+
+RET_VAL add_op(AST_NODE*);
+
+RET_VAL sub_op(AST_NODE*);
+
+RET_VAL mult_op(AST_NODE*);
+
+RET_VAL div_op(AST_NODE*);
+
+RET_VAL remaind_op(AST_NODE*);
+
+RET_VAL exp_op(AST_NODE*);
+
+RET_VAL exp2_op(AST_NODE*);
+
+RET_VAL pow_op(AST_NODE*);
+
+RET_VAL log_op(AST_NODE*);
+
+RET_VAL sqrt_op(AST_NODE*);
+
+RET_VAL cbrt_op(AST_NODE*);
+
+RET_VAL hypot_op(AST_NODE*);
+
+RET_VAL max_op(AST_NODE*);
+
+RET_VAL min_op(AST_NODE*);
+
 #endif
