@@ -249,7 +249,7 @@ void printRetVal(RET_VAL val) {
         printf("INTEGER: %lf\n", val.value);
     } else if (val.type == INT_TYPE) {
         // Casting to type int from double
-        printf("INTEGER: %d\n", (int)val.value);
+        printf("INTEGER: %d\n", (int) val.value);
     } else if (val.type == DOUBLE_TYPE) {
         printf("DOUBLE: %lf\n", val.value);
     }
@@ -282,186 +282,171 @@ void freeNode(AST_NODE *node) {
 
     free(node);
 }
+
 RET_VAL neg_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: neg called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
-    RET_VAL operand = eval(oplist);
-    if(oplist->next != NULL)
-    {
+    // evaluate the head of the oplist, number or function and assign to object.jkkjj
+    RET_VAL op1 = eval(oplist);
+    if (oplist->next != NULL) {
         puts("WARNING: neg called with extra (ignored) operands!");
     }
-    result.type = operand.type;
-    result.value = -operand.value;
+    result.type = op1.type;
+    result.value = -op1.value;
     return result;
 }
 
 RET_VAL abs_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: abs called with no args.");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
-    RET_VAL operand = eval(oplist);
-    if(oplist->next != NULL)
-    {
+    // evaluate the head of the oplist, number or function and assign to object.jkkjj
+    RET_VAL op1 = eval(oplist);
+    if (oplist->next != NULL) {
         puts("WARNING: abs call with extra operands. Only first operand used!");
     }
-    result.type = operand.type;
-    result.value = (operand.value < 0)? -operand.value: operand.value;
+    result.type = op1.type;
+    result.value = (op1.value < 0) ? -op1.value : op1.value;
     return result;
 }
 
 RET_VAL add_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("WARNING: add call with no operands, 0 returned!");
         result.type = INT_TYPE;
         result.value = 0;
         return result;
     }
-    RET_VAL operand = eval(oplist);
-    if(oplist->next != NULL)
-    {
+    // evaluate the head of the oplist, number or function and assign to object.jkkjj
+    RET_VAL op1 = eval(oplist);
+    if (oplist->next != NULL) {
         // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
         // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
         // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (operand.type|| oplist->next->data.number.type)? DOUBLE_TYPE: INT_TYPE;
+        result.type = (op1.type || oplist->next->data.number.type) ? DOUBLE_TYPE : INT_TYPE;
         // Recursive implementation of add op
-        result.value = operand.value + add_op(oplist->next).value;
+        result.value = op1.value + add_op(oplist->next).value;
         return result;
 
-    }else if(oplist->next == NULL)
-    {
-        return operand;
+    } else if (oplist->next == NULL) {
+        return op1;
     }
-
 
 
 }
 
 RET_VAL sub_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: sub called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
-    }else if(oplist->next == NULL)
-    {
+    } else if (oplist->next == NULL) {
         puts("ERROR: sub called with only one arg!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
-    if(oplist->next != NULL)
-    {
-        if(oplist->next->next != NULL)
-        {
-            puts("WARNING: sub called with extra (ignored) operands!");
-        }
-        // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
-        // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
-        // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (operand.type || oplist->next->data.number.type)? DOUBLE_TYPE: INT_TYPE;
-        result.value = operand.value - oplist->next->data.number.value;
+    // evaluate the head of the oplist, number or function and assign to object.jkkjj
+    RET_VAL op1 = eval(oplist);
+    RET_VAL op2 = eval(oplist->next);
+    if (oplist->next->next != NULL) {
+        puts("WARNING: sub called with extra (ignored) operands!");
     }
+    // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
+    // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
+    // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
+    result.type = (op1.type || op2.type) ? DOUBLE_TYPE
+                                         : INT_TYPE;
+    result.value = op1.value - op2.value;
+
     return result;
 }
 
 RET_VAL mult_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("WARNING: mult call with no operands, 1 returned!");
         result.type = INT_TYPE;
         result.value = 1;
         return result;
     }
-    if(oplist->next != NULL)
-    {
+    RET_VAL op1 = eval(oplist);
+    if (oplist->next != NULL) {
         // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
         // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
         // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (oplist->data.number.type|| oplist->next->data.number.type)? DOUBLE_TYPE: INT_TYPE;
-        // Recursive implementation of add op
-        result.value = oplist->data.number.value *mult_op(oplist->next).value;
+        result.type = (op1.type || oplist->next->data.number.type) ? DOUBLE_TYPE : INT_TYPE;
+        // Recursive implementation of mult op
+        result.value = op1.value * mult_op(oplist->next).value;
+        return result;
 
-    }else if(oplist->next == NULL)
-    {
-        result.value = oplist->data.number.value;
-        // Ternary op to assign type to result object
-        result.type = (oplist->data.number.type == DOUBLE_TYPE)? DOUBLE_TYPE: INT_TYPE;
+    } else if (oplist->next == NULL) {
+        return op1;
     }
-    return result;
+
 
 }
 
 RET_VAL div_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: div called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
-    }else if(oplist->next == NULL)
-    {
+    } else if (oplist->next == NULL) {
         puts("ERROR: div called with only one arg!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
-    }else if(oplist->next != NULL)
-    {
-        if(oplist->next->next != NULL)
-        {
-            puts("WARNING: div called with extra (ignored) operands!");
-        }
-        // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
-        // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
-        // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (oplist->data.number.type || oplist->next->data.number.type)? DOUBLE_TYPE: INT_TYPE;
-        result.value = (oplist->next->data.number.value)? oplist->data.number.value / oplist->next->data.number.value: NAN;
     }
+    RET_VAL op1 = eval(oplist), op2 = eval(oplist->next);
+    if (oplist->next->next != NULL) {
+        puts("WARNING: div called with extra (ignored) operands!");
+    }
+    // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
+    // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
+    // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
+    result.type = (op1.type || op2.type) ? DOUBLE_TYPE : INT_TYPE;
+    result.value = (op2.value) ? op1.value / op2.value
+                               : NAN;
     return result;
 }
 
 RET_VAL remaind_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: remainder called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
-    }else if(oplist->next == NULL)
-    {
+    } else if (oplist->next == NULL) {
         puts("ERROR: remainder called with only one arg!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
-    }else if(oplist->next != NULL)
-    {
-        if(oplist->next->next != NULL)
-        {
+    } else if (oplist->next != NULL) {
+        if (oplist->next->next != NULL) {
             puts("WARNING: remainder called with extra (ignored) operands!");
         }
         // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
         // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
         // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (oplist->data.number.type || oplist->next->data.number.type)? DOUBLE_TYPE: INT_TYPE;
+        result.type = (oplist->data.number.type || oplist->next->data.number.type) ? DOUBLE_TYPE : INT_TYPE;
         result.value = remainder(oplist->data.number.value, oplist->next->data.number.value);
-        if(result.value < 0){
+        if (result.value < 0) {
             result.value = oplist->next->data.number.value + result.value;
         }
     }
@@ -470,15 +455,13 @@ RET_VAL remaind_op(AST_NODE *oplist) {
 
 RET_VAL exp_op(AST_NODE *oplist) {
     RET_VAL result;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: exp called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
-    if(oplist->next != NULL)
-    {
+    if (oplist->next != NULL) {
         puts("WARNING: exp called with extra (ignored) operands!");
     }
     result.type = DOUBLE_TYPE;
@@ -489,19 +472,17 @@ RET_VAL exp_op(AST_NODE *oplist) {
 RET_VAL exp2_op(AST_NODE *oplist) {
     RET_VAL result;
     RET_VAL operand = eval(oplist);
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: exp2 called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
-    if(oplist->next != NULL)
-    {
+    if (oplist->next != NULL) {
         puts("WARNING: exp2 called with extra (ignored) operands!");
     }
     // Ternary operator. If operand is positive and INT, return INT type, otherwise returns DOUBLE type
-    result.type = (operand.value >= 0 && operand.type == INT_TYPE)? INT_TYPE : DOUBLE_TYPE;
+    result.type = (operand.value >= 0 && operand.type == INT_TYPE) ? INT_TYPE : DOUBLE_TYPE;
     result.value = pow(2, operand.value);
 
     return result;
