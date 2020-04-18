@@ -1,24 +1,428 @@
-## CiLisp
-### Summary
-This is the first task. It required completing both the lex and yacc files, as well as eval functions for the grammar of a lisp like language for evaluating expressions in CNP form.
-#### Task 1 ::= CPN Calculator  
+# CiLisp
+
+#### Task 1 ::= CPN Calculator 
+This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for the grammar of a lisp like language for evaluating expressions in CNP form.  
+
+---
 **noteable**:  
-For the NEG operation, I had to add a production for _s_expr_list_ to handle the instance when no operand is provided. I suspect it is necessary for all ops.  
-Added \v and \r to the lex file for ignoring whitespace.  
-For add_op, used recursion to sum the oplist.  
-Called freeNode($1) after execution is done on base of tree, to free memory and satisfy the Valgring monster.  
-I use ternary operators wherever (appropriately) possible and, for example, in conditionals when differentiating enumerated types, I take advantage of the fact that enumerated types resolve to integer values, and that integer values  are interpreted as true or false values. I do this when determining the RET_VAL type from NUM_AST_NODE types.  
-For division by 0, I have chosen to return nan without throwing an error or warning. nan is enough of a warning.  
- 
-      
-Summarize what has been done so far. Specify which tasks have been completed so far.
-### Sample Runs
-Sample runs should all come from the most recent implementation. Sample runs which were done to test previous tasks should be done again with the new implementation.
-You'll save a lot of time here if you save all of your test inputs for each task in the inputs folder and keep them organized!
-Sample runs should be organized by task; there should be sample runs showing that everything in task 1 still works in the up-to-date implementation, and so on up through the most recent task.
+- I had to add a production for _s_expr_list_ to handle the instance when no operand is provided. 
+- A production was added to _program_ for the case when there is no instruction. In an input file, this is represented by a blank line.    
+- Added \v and \r to the lex file for ignoring whitespace.  
+- Originally I had written the math op functions to use recursion, but I could not figure out how to accuratly track return type through recursive calls, but I could easily do it iterating through the linked oplist.    
+- Called freeNode($1) after execution is done on base of tree, to free memory and satisfy the Valgrind monster.  
+- I make frequent use of the ternary operator. When unclear, I comment.  
+- For division by 0, I have chosen to return nan without throwing an error or warning. nan is enough of a warning. There was no explicit instruction for divide by zero error in function implementation description, so I took my own liberty.  
+- The file `/inputs/allValidTestInputs.txt` is a running collection of valid inputs that will continue to be added to and tested through all tasks in this lab.  
+---
+---  
+
+## Run 1 : valid input 
+Input in `/inputs/input1.txt` was collected from Task 1 example sample runs and includes other inputs that I wanted to test to make sure things like whitespace were correctly ignored, and that when nested functions threw an error, the rest of the function completed correctly. Such as when a call to sub with no operands was nested deep in other functions, the output should only be the error warning followed by NAN, or whatever the correct output is supposed to be paired with the specific warning.  
+#### `input1.txt`  
+```
+(neg 5)
+
+(neg 5.5)
+(neg -5.0)
+(neg -5)
+(neg)
+(neg 1 2)
+(abs 1)
+(abs 1.2)
+(abs -3)
+(abs 0)
+(abs 0.0)
+(abs -1.4)
+(abs)
+(abs -1 2)
+(add)
+(add 1)
+(add 1.0)
+(add 1 2 3 4 5)
+(add 1 -2 3 -4 5 -6)
+(add 0.0 1 -2 3 -4 5 -6)
+(add 1 -1.0)
+(sub)
+(sub 1)
+(sub 1.0)
+(sub 1 2)
+(sub 2 1)
+(sub 2 -1)
+(sub 2.0 1)
+(sub 2.0 -1)
+(sub 1 1.0)
+(sub 2.0 1.0)
+(sub 1 2 3)
+(mult)
+(mult 1)
+(mult 1.0)
+(mult -1)
+(mult -1 -1.0)
+(mult 1 -2 3 -4 5)
+(mult -1.0 2 -3.0 4 -5)
+(div)
+(div 1)
+(div 1.0)
+(div 1 2)
+(div 1.0 2)
+(div 2 1)
+(div 2.0 1)
+(div 5 2.0)
+(div -20.0 4)
+(div 1 2 3 4)
+(div 1 2 3)
+(div 5.0 2 3)
+(div 20 0)
+(remainder)
+(remainder 1)
+(remainder 0)
+(remainder -1.0)
+(remainder 1 2)
+(remainder 2 1)
+(remainder 2.5 1)
+(remainder 2 3)
+(remainder -6 10)
+(remainder -6.0 10.0)
+(remainder -6.0 -10.0)
+(remainder 1 2 3)
+(remainder 23 7 10)
+(exp)
+(exp 1)
+(exp (log 1))
+(exp -1)
+(exp 5.0)
+(exp -2.0)
+(exp 1 2)
+(exp2)
+(exp2 1)
+(exp2 1.0)
+(exp2 0)
+(exp2 0.0)
+(exp2 0.5)
+(exp2 (div 1 2.0))
+(exp2 -2)
+(exp2 -2.0)
+(exp2 1 2)
+(pow)
+(pow 1)
+(pow 1.0)
+(pow 1 1)
+(pow 1 1.0)
+(pow 2 1)
+(pow 2.1 1)
+(pow -2 0.5)
+(pow -2 0)
+(pow -2.0 0.0)
+(pow -2.0 0)
+(pow 3 3)
+(pow 3.0 3)
+(pow 27 (div 1 3.0))
+(pow 1 2 3)
+(log)
+(log 1)
+(log 0)
+(log -1)
+(log 0.0)
+(log -1.0)
+(log (exp 1))
+(div (log 27) (log 3))
+(div (log 27.0) (log 3))
+(log 1 2)
+(sqrt)
+(sqrt 1)
+(sqrt 1.0)
+(sqrt 0)
+(sqrt 0.0)
+(sqrt -1)
+(sqrt -1.0)
+(sqrt 4)
+(sqrt 4.0)
+(sqrt 2)
+(sqrt 1 2)
+(cbrt)
+(cbrt 0)
+(cbrt 0.0)
+(cbrt -1)
+(cbrt -1.0)
+(cbrt 1)
+(cbrt 1.0)
+(cbrt 27)
+(cbrt           27.0)
+(cbrt 4)
+(cbrt (pow 3 3))
+(cbrt (pow 3 6))
+(cbrt 1 2)
+(hypot)
+(hypot 1)
+(hypot 1.0)
+(hypot 3 4)
+(hypot -3 4)
+(hypot -30 -40.0)
+(hypot 4 4 7)
+(hypot 7.0 4 4.0)
+(hypot 12 13 14)
+(hypot 5 5 5)
+(hypot -5 -5.0 (sqrt 25))
+(hypot 0 0 0.0 -3 0 0 0 0 4 0.0 -0.0 12)
+(max)
+(max 1)
+(max -1)
+(max 1.0)
+(max 	232311.121)
+(max 1 2 3 4 5 6 7 8.0 9)
+(max 1 2 25.0 -26.0 12)
+(min)
+(min 1)
+(min 0.0)
+(min 0)
+
+(min -1 2 -3 4 -5 6)
+(min                -1.0    -12.0   12)
+(log (exp (log (exp 1))))
+(sub (mult 1 2 3 4) (add 1 2 3 4))
+(sub (mult 1 2 3 -4.0) (add -1 -2 -3 -4))
+(hypot (sqrt (div 100 7.0)) (mult 6 (sqrt (div 100.0 7))))
+(       hypot (sqrt (div 100 7.0)) (sqrt (mult 6 (div           100.0 7))))
+(add 1      (add              2 (add 3 (add 4 (add 5 (add 6 (add 7)))))))
+(add 1 (add     2 (add 3 (add 4 (add 5 (add 6 (sub 0 -7.0)))))))
+(mult 1 (sub))
+(sub 2 1 (add 1))
+```
+### Run 1 : output
+```
+INTEGER: -5
+DOUBLE: -5.500000
+DOUBLE: 5.000000
+INTEGER: 5
+ERROR: neg called with no operands!
+INTEGER: nan
+WARNING: neg called with extra (ignored) operands!
+INTEGER: -1
+INTEGER: 1
+DOUBLE: 1.200000
+INTEGER: 3
+INTEGER: 0
+DOUBLE: 0.000000
+DOUBLE: 1.400000
+ERROR: abs called with no args.
+INTEGER: nan
+WARNING: abs call with extra operands. Only first operand used!
+INTEGER: 1
+WARNING: add call with no operands, 0 returned!
+INTEGER: 0
+INTEGER: 1
+DOUBLE: 1.000000
+INTEGER: 15
+INTEGER: -3
+DOUBLE: -3.000000
+DOUBLE: 0.000000
+ERROR: sub called with no operands!
+INTEGER: nan
+ERROR: sub called with only one arg!
+INTEGER: nan
+ERROR: sub called with only one arg!
+INTEGER: nan
+INTEGER: -1
+INTEGER: 1
+INTEGER: 3
+DOUBLE: 1.000000
+DOUBLE: 3.000000
+DOUBLE: 0.000000
+DOUBLE: 1.000000
+WARNING: sub called with extra (ignored) operands!
+INTEGER: -1
+WARNING: mult call with no operands, 1 returned!
+INTEGER: 1
+INTEGER: 1
+DOUBLE: 1.000000
+INTEGER: -1
+DOUBLE: 1.000000
+INTEGER: 120
+DOUBLE: -120.000000
+ERROR: div called with no operands!
+INTEGER: nan
+ERROR: div called with only one arg!
+INTEGER: nan
+ERROR: div called with only one arg!
+INTEGER: nan
+INTEGER: 0
+DOUBLE: 0.500000
+INTEGER: 2
+DOUBLE: 2.000000
+DOUBLE: 2.500000
+DOUBLE: -5.000000
+WARNING: div called with extra (ignored) operands!
+INTEGER: 0
+WARNING: div called with extra (ignored) operands!
+INTEGER: 0
+WARNING: div called with extra (ignored) operands!
+DOUBLE: 2.500000
+Division by zero error
+INTEGER: nan
+ERROR: remainder called with no operands!
+INTEGER: nan
+ERROR: remainder called with only one arg!
+INTEGER: nan
+ERROR: remainder called with only one arg!
+INTEGER: nan
+ERROR: remainder called with only one arg!
+INTEGER: nan
+INTEGER: 1
+INTEGER: 0
+DOUBLE: 0.500000
+INTEGER: 2
+INTEGER: 4
+DOUBLE: 4.000000
+DOUBLE: 4.000000
+WARNING: remainder called with extra (ignored) operands!
+INTEGER: 1
+WARNING: remainder called with extra (ignored) operands!
+INTEGER: 2
+ERROR: exp called with no operands!
+INTEGER: nan
+DOUBLE: 2.718282
+DOUBLE: 1.000000
+DOUBLE: 0.367879
+DOUBLE: 148.413159
+DOUBLE: 0.135335
+WARNING: exp called with extra (ignored) operands!
+DOUBLE: 2.718282
+ERROR: exp2 called with no operands!
+INTEGER: nan
+INTEGER: 2
+DOUBLE: 2.000000
+INTEGER: 1
+DOUBLE: 1.000000
+DOUBLE: 1.414214
+DOUBLE: 1.414214
+DOUBLE: 0.250000
+DOUBLE: 0.250000
+WARNING: exp2 called with extra (ignored) operands!
+INTEGER: 2
+ERROR: pow called with no operands!
+INTEGER: nan
+ERROR: pow called with only one arg!
+INTEGER: nan
+ERROR: pow called with only one arg!
+INTEGER: nan
+INTEGER: 1
+DOUBLE: 1.000000
+INTEGER: 2
+DOUBLE: 2.100000
+INTEGER: nan
+INTEGER: 1
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+INTEGER: 27
+DOUBLE: 27.000000
+DOUBLE: 3.000000
+WARNING: pow called with extra (ignored) operands!
+INTEGER: 1
+ERROR: log called with no operands!
+INTEGER: nan
+DOUBLE: 0.000000
+DOUBLE: -inf
+INTEGER: nan
+DOUBLE: -inf
+INTEGER: nan
+DOUBLE: 1.000000
+DOUBLE: 3.000000
+DOUBLE: 3.000000
+WARNING: log called with extra (ignored) operands!
+DOUBLE: 0.000000
+ERROR: sqrt called with no operands!
+INTEGER: nan
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+DOUBLE: 0.000000
+DOUBLE: 0.000000
+INTEGER: nan
+INTEGER: nan
+DOUBLE: 2.000000
+DOUBLE: 2.000000
+DOUBLE: 1.414214
+WARNING: sqrt called with extra (ignored) operands!
+DOUBLE: 1.000000
+ERROR: cbrt called with no operands!
+INTEGER: nan
+DOUBLE: 0.000000
+DOUBLE: 0.000000
+DOUBLE: -1.000000
+DOUBLE: -1.000000
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+DOUBLE: 3.000000
+DOUBLE: 3.000000
+DOUBLE: 1.587401
+DOUBLE: 3.000000
+DOUBLE: 9.000000
+WARNING: cbrt called with extra (ignored) operands!
+DOUBLE: 1.000000
+ERROR: hypot called with no operands, 0.0 returned!
+DOUBLE: 0.000000
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+DOUBLE: 5.000000
+DOUBLE: 5.000000
+DOUBLE: 50.000000
+DOUBLE: 9.000000
+DOUBLE: 9.000000
+DOUBLE: 22.561028
+DOUBLE: 8.660254
+DOUBLE: 8.660254
+DOUBLE: 13.000000
+ERROR: max called with no operands!
+INTEGER: nan
+INTEGER: 1
+INTEGER: -1
+DOUBLE: 1.000000
+DOUBLE: 232311.121000
+INTEGER: 9
+DOUBLE: 25.000000
+ERROR: min called with no operands!
+INTEGER: nan
+INTEGER: 1
+DOUBLE: 0.000000
+INTEGER: 0
+INTEGER: -5
+DOUBLE: -12.000000
+DOUBLE: 1.000000
+INTEGER: 14
+DOUBLE: -14.000000
+DOUBLE: 22.990681
+DOUBLE: 10.000000
+INTEGER: 28
+DOUBLE: 28.000000
+ERROR: sub called with no operands!
+INTEGER: nan
+WARNING: sub called with extra (ignored) operands!
+INTEGER: 1
+
+Process finished with exit code 0
+
+```
+---
+## Run 2 : invalid inputs
+Input in `/inputs/badinput1.txt` are instructions I tested that I knew to be invalid, and were all correctly rejected.  
+```
+()
+(a dd 1 2)
+(add 1 1(
+add 12 12
+(1 2 add)
+(func 2 3)
+(123)
+```
+### Run 2 : output
+Each invalid input correctly threw this error.  
+```
+
+ERROR: syntax error
+
+Process finished with exit code 1
+
+```
+---  
+---
 ### Known Bugs
-If anything is not functioning to specification, you are responsible enough for testing enough to recognize that this is the case and fix it. If you give up on fixing something, you are required to list it here.
-Bugs which are discovered by the grader but not listed here will be graded harshly. Bugs which are listed here will be graded nicely, within reason.
-Known bugs should also be organized by task, and should be well-described.
-Lazy bug descriptions which don't go into detail about what is going wrong ("<functionality> doesn't work", "<feature> throws an error") will be graded as if the bug was not listed here.
-This includes bugs that were created in functionality from prior tasks. If your task 5 breaks your task 3, we will check your task 3 submission if the bug is noted here, but if it is not noted here then we will assume that task 3 never worked and grade accordingly.
+- When input is read from file, the outputs are printed to console, but the string representation of the original instruction are not. I tried to add a few lines of code to main in `ciLisp.l` but it didn't work. I suspect reading from the input stream prior to the call to yyparse() will be a problem, but I couldn't seem to get even that far.  

@@ -324,27 +324,29 @@ RET_VAL abs_op(AST_NODE *oplist) {
 
 RET_VAL add_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op1;
     if (oplist == NULL) {
         puts("WARNING: add call with no operands, 0 returned!");
         result.type = INT_TYPE;
         result.value = 0;
         return result;
     }
-    // evaluate the head of the oplist, number or function and assign to object.jkkjj
-    RET_VAL op1 = eval(oplist);
-    if (oplist->next != NULL) {
-        // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
-        // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
-        // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (op1.type || oplist->next->data.number.type) ? DOUBLE_TYPE : INT_TYPE;
-        // Recursive implementation of add op
-        result.value = op1.value + add_op(oplist->next).value;
-        return result;
-
-    } else if (oplist->next == NULL) {
-        return op1;
+    AST_NODE *nextop = oplist;
+    op1 = eval(nextop);
+    double sum = op1.value;
+    result.type = op1.type;
+    while(nextop->next != NULL)
+    {
+        nextop = nextop->next;
+        op1 = eval(nextop);
+        if(op1.type == DOUBLE_TYPE)
+        {
+            result.type = DOUBLE_TYPE;
+        }
+        sum += op1.value;
     }
-
+    result.value = sum;
+    return result;
 
 }
 
@@ -379,27 +381,29 @@ RET_VAL sub_op(AST_NODE *oplist) {
 
 RET_VAL mult_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op1;
     if (oplist == NULL) {
         puts("WARNING: mult call with no operands, 1 returned!");
         result.type = INT_TYPE;
         result.value = 1;
         return result;
     }
-    RET_VAL op1 = eval(oplist);
-    if (oplist->next != NULL) {
-        // Ternary op to assign type to result object - INT_TYPE resolves to 0, 0 resolves to false,
-        // If the conditional below resolves to 0, resolves to false, and INT_TYPE is assigned. If either are not 0,
-        // then it resolves to true, and DOUBLE_TYP is assigned. 0||0 is 0, 0||1 is 1.
-        result.type = (op1.type || oplist->next->data.number.type) ? DOUBLE_TYPE : INT_TYPE;
-        // Recursive implementation of mult op
-        result.value = op1.value * mult_op(oplist->next).value;
-        return result;
-
-    } else if (oplist->next == NULL) {
-        return op1;
+    AST_NODE *nextop = oplist;
+    op1 = eval(nextop);
+    double product = op1.value;
+    result.type = op1.type;
+    while(nextop->next != NULL)
+    {
+        nextop = nextop->next;
+        op1 = eval(nextop);
+        if(op1.type == DOUBLE_TYPE)
+        {
+            result.type = DOUBLE_TYPE;
+        }
+        product *= op1.value;
     }
-
-
+    result.value = product;
+    return result;
 }
 
 RET_VAL div_op(AST_NODE *oplist) {
@@ -590,7 +594,7 @@ RET_VAL hypot_op(AST_NODE *oplist) {
 
     AST_NODE *nextop = oplist;
     op1 = eval(nextop);
-    int soq = op1.value * op1.value;
+    double soq = op1.value * op1.value;
     while(nextop->next != NULL)
     {
         nextop = nextop->next;
@@ -604,11 +608,61 @@ RET_VAL hypot_op(AST_NODE *oplist) {
 
 RET_VAL max_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op;
+    double maxVal;
+    if(oplist == NULL)
+    {
+        puts("ERROR: max called with no operands!");
+        result.type = INT_TYPE;
+        result.value = NAN;
+        return result;
+    }
+    AST_NODE *nextop = oplist;
+    op = eval(nextop);
+    result.type = op.type;
+    maxVal = op.value;
+    while(nextop->next != NULL)
+    {
+
+        nextop = nextop->next;
+        op = eval(nextop);
+        if(maxVal < op.value)
+        {
+            maxVal = op.value;
+            result.type = op.type;
+        }
+    }
+    result.value = maxVal;
     return result;
 }
 
 RET_VAL min_op(AST_NODE *oplist) {
     RET_VAL result;
+    RET_VAL op;
+    double minVal;
+    if(oplist == NULL)
+    {
+        puts("ERROR: min called with no operands!");
+        result.type = INT_TYPE;
+        result.value = NAN;
+        return result;
+    }
+    AST_NODE *nextop = oplist;
+    op = eval(nextop);
+    result.type = op.type;
+    minVal = op.value;
+    while(nextop->next != NULL)
+    {
+
+        nextop = nextop->next;
+        op = eval(nextop);
+        if(minVal > op.value)
+        {
+            minVal = op.value;
+            result.type = op.type;
+        }
+    }
+    result.value = minVal;
     return result;
 }
 

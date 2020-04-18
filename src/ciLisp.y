@@ -35,6 +35,11 @@ program:
     }
     | EOFT {
         exit(EXIT_SUCCESS);
+    }
+    |
+    EOL {
+	YYACCEPT;
+
     };
 
 s_expr:
