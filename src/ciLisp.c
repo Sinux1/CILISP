@@ -1,3 +1,8 @@
+/*
+// Samad Mazarei
+// Lab: CiLisp
+// Date: 4/21/2020
+*/
 #include "ciLisp.h"
 
 void yyerror(char *s) {
@@ -106,6 +111,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList) {
     free(funcName);
     return node;
 }
+
 
 
 // Receives an AST_NODE *list (an s_expr_list) and an
@@ -503,7 +509,7 @@ RET_VAL pow_op(AST_NODE *oplist) {
     RET_VAL op1, op2;
     if (oplist == NULL) {
         puts("ERROR: pow called with no operands!");
-        result.type == INT_TYPE;
+        result.type = INT_TYPE;
         result.value = NAN;
         return result;
     } else if (oplist->next == NULL) {
@@ -665,6 +671,44 @@ RET_VAL min_op(AST_NODE *oplist) {
     result.value = minVal;
     return result;
 }
+// Create Symbol Node- Receives a string from tokenizer
+// Sets node type and symbol id
+AST_NODE *createSymbolNode(char *id){
+    AST_NODE *node;
+    size_t nodeSize;
+    nodeSize = sizeof(AST_NODE);
+    if ((node = calloc(nodeSize, 1)) == NULL)
+        yyerror("Memory allocation failed!");
+
+    node->type = SYM_NODE_TYPE;
+    node->data.symbol.id = id;
+    free(id);
+    return node;
+}
+// Hooks up pointer to records
+AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node){
+    node->symbolTable = record;
+    return node;
+}
+// Adds newHead to list of sym table nodes
+AST_NODE *addRecordToList(SYMBOL_TABLE_NODE *newHead, SYMBOL_TABLE_NODE *list){
+    newHead->next = list;
+    return newHead;
+}
+// Receives a string from SYMBOL token and creates an AST node
+// pointing *value at the argument node
+AST_NODE *createSymbolTableNode(char *id, AST_NODE *node){
+    SYMBOL_TABLE_NODE *tnode;
+    size_t nodeSize;
+    nodeSize = sizeof(SYMBOL_TABLE_NODE);
+    if ((tnode = calloc(nodeSize, 1)) == NULL)
+        yyerror("Memory allocation failed!");
+
+    tnode->id = id;
+    tnode->value = node;
+    return node;
+}
+
 
 
 

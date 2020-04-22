@@ -7,12 +7,14 @@
     double dval;
     char *sval;
     struct ast_node *astNode;
+    struct symbol_table_node *stNode;
 }
 
-%token <sval> FUNC
+%token <sval> FUNC SYMBOL
 %token <dval> INT DOUBLE
-%token LPAREN RPAREN EOL QUIT EOFT
+%token LPAREN RPAREN EOL QUIT EOFT LET
 
+%type <stNode> let_section let_list let_elem
 %type <astNode> s_expr f_expr number s_expr_list
 
 %%
@@ -39,17 +41,28 @@ program:
     |
     EOL {
 	YYACCEPT;
-
     };
 
 s_expr:
-    number {
-        ylog(s_expr, number);
+    f_expr {
+        ylog(s_expr, f_expr);
         $$ = $1;
     }
-    | f_expr {
-    	ylog(s_expr, f_expr);
-    	$$ = $1;
+    |
+    number {
+    ylog(s_expr, number);
+    $$ = $1;
+    }
+    |
+    SYMBOL {
+    ylog(s_expr, symbol);
+    $$ = createSymbolNode($1);
+    }
+    |
+    LPAREN let_section s_expr RPAREN {
+    ylog(s_expr,LPAR let_section s_expr RPAR );
+    $$ == assignSymbolTable($2, $3);
+
     }
     | QUIT {
         ylog(s_expr, QUIT);
@@ -59,17 +72,6 @@ s_expr:
         ylog(s_expr, error);
         yyerror("unexpected token");
         $$ = NULL;
-    };
-
-number:
-    INT {
-	ylog(number, INT);
-	$$ = createNumberNode($1, INT_TYPE);
-    }
-    |
-    DOUBLE {
-	ylog(number, DOUBLE);
-        $$ = createNumberNode($1, DOUBLE_TYPE);
     };
 
 f_expr:
@@ -90,7 +92,47 @@ s_expr_list:
     }
 
     |{
+    	ylog(s_expr, NULL);
     	$$ = NULL;
     };
+
+let_section:
+	LPAREN LET let_list RPAREN {
+	ylog(let_section, LPAR LET let_list RPAR);
+	$$ = $3;
+	}
+	| {
+	ylog(let_section, NULL);
+	$$ = NULL;
+	};
+
+let_list:
+	let_elem let_list {
+	ylog(let_list, let_elem let_list);
+	$$ = addRecordToList($1, $2);
+	}
+	|
+	let_elem {
+	ylog(let_list, let_elem);
+	$$ = $1;
+	}
+
+let_elem:
+	LPAREN SYMBOL s_expr RPAREN {
+	ylog(let_elem, LPAR SYMBOL s_expr RPAR);
+	$$ = createSymbolTableNode($2, $3);
+	}
+
+number:
+    INT {
+	ylog(number, INT);
+	$$ = createNumberNode($1, INT_TYPE);
+    }
+    |
+    DOUBLE {
+	ylog(number, DOUBLE);
+        $$ = createNumberNode($1, DOUBLE_TYPE);
+    };
+
 %%
 
