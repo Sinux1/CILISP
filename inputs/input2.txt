@@ -1,1 +1,10 @@
-asd
+( (let (x 1) ) x )
+(add ((let (abc 1)) (sub 3 abc)) 4)
+(mult ((let (a 1) (b 2)) (add a b)) (sqrt 2))
+(add ((let (a ((let (b 2)) (mult b (sqrt 10))))) (div a 2)) ((let (c 5)) (sqrt c)))
+((let (first (sub 5 1)) (second 2)) (add (pow 2 first) (sqrt second)))
+((let (abc 1)) (sub ((let (abc 2) (de 3)) (add abc de)) abc))
+((let (x 3) (x 30)) (add ((let (x 10) (x 100)) x) x))
+((let (abc 1)) (sub ((let (abc 2)) (add abc de)) abc))
+QUIT
+quit

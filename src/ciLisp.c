@@ -99,20 +99,29 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList) {
 
     // Sets type
     node->type = FUNC_NODE_TYPE;
+
     // Assign reference to oplist
     node->data.function.opList = opList;
+    AST_NODE *lnode = node->data.function.opList;
+
+    // Assign every operand in oplist the same parent - the AST_NODE being returned
+    lnode->parent = node;
+    while (lnode->next != NULL) {
+        lnode = lnode->next;
+        lnode->parent = node;
+    }
+
     // Assign function operation, using assignment return value to test if custom op,
     // assigning ident if it is and returning node.
     if ((node->data.function.oper = resolveFunc(funcName)) == CUSTOM_OPER) {
         node->data.function.ident = funcName;
         return node;
     }
+
     // If not custom op, free funcName
     free(funcName);
     return node;
 }
-
-
 
 // Receives an AST_NODE *list (an s_expr_list) and an
 // AST_NODE *newHead (the new element to add to the list as
@@ -125,7 +134,6 @@ AST_NODE *addOperandToList(AST_NODE *newHead, AST_NODE *list) {
     // return the newHead
     return newHead;
 }
-
 
 // Evaluates an AST_NODE whose type is NUM_NODE_TYPE.
 // Called by the eval function, which evaluates any AST_NODE.
@@ -143,7 +151,6 @@ RET_VAL evalNumNode(AST_NODE *node) {
     result.type = node->data.number.type;
     return result;
 }
-
 
 // Evaluates an AST_NODE whose type is FUNC_NODE_TYPE.
 // Called by the eval function, which evaluates any AST_NODE.
@@ -219,6 +226,43 @@ RET_VAL evalFuncNode(AST_NODE *node) {
     return result;
 }
 
+RET_VAL evalSymbolNode(AST_NODE *node)
+{
+    // Symbol we are looking for
+    char *sid = node->data.symbol.id;
+    // searching the most recent scope first
+    AST_NODE *parent = node;
+    // Declare table pointer
+    SYMBOL_TABLE_NODE *table;
+    // Declare record pointer
+    SYMBOL_TABLE_NODE *record;
+    // If symbol never resolves, initialize default value
+    RET_VAL result = DEFAULT_RET_VAL;
+    do{
+        // Initialize table and record
+        table = parent->symbolTable;
+        record = table;
+        // Iterate over table comparing record to sid
+        while(record != NULL)
+        {
+            // Condition resolves to 0 (False) when strings are equal
+            // so !(strcmp()) will resolve to true when equal
+            if(!(strcmp(record->id, sid)))
+            {
+                // call to eval will resolve the value node
+                result = eval(record->value);
+                return result;
+            }
+            record = record->next;
+
+        }
+        parent = parent->parent;
+    }while(parent != NULL);
+    // If the next line executes it is because the symbol was not found in the table
+    puts("Undefined Symbol!");
+    return result;
+}
+
 // Evaluates an AST_NODE.
 // returns a RET_VAL storing the the resulting value and type.
 // You'll need to update and expand eval (and the more specific eval functions below)
@@ -239,13 +283,15 @@ RET_VAL eval(AST_NODE *node) {
         case FUNC_NODE_TYPE:
             result = evalFuncNode(node);
             break;
+        case SYM_NODE_TYPE:
+            result = evalSymbolNode(node);
+            break;
         default:
             yyerror("Invalid AST_NODE_TYPE, probably invalid writes somewhere!");
     }
 
     return result;
 }
-
 
 // prints the type and value of a RET_VAL
 void printRetVal(RET_VAL val) {
@@ -265,7 +311,6 @@ void printRetVal(RET_VAL val) {
 
 
 }
-
 
 // Called after execution is done on the base of the tree.
 // (see the program production in ciLisp.y)
@@ -341,12 +386,10 @@ RET_VAL add_op(AST_NODE *oplist) {
     op1 = eval(nextop);
     double sum = op1.value;
     result.type = op1.type;
-    while(nextop->next != NULL)
-    {
+    while (nextop->next != NULL) {
         nextop = nextop->next;
         op1 = eval(nextop);
-        if(op1.type == DOUBLE_TYPE)
-        {
+        if (op1.type == DOUBLE_TYPE) {
             result.type = DOUBLE_TYPE;
         }
         sum += op1.value;
@@ -398,12 +441,10 @@ RET_VAL mult_op(AST_NODE *oplist) {
     op1 = eval(nextop);
     double product = op1.value;
     result.type = op1.type;
-    while(nextop->next != NULL)
-    {
+    while (nextop->next != NULL) {
         nextop = nextop->next;
         op1 = eval(nextop);
-        if(op1.type == DOUBLE_TYPE)
-        {
+        if (op1.type == DOUBLE_TYPE) {
             result.type = DOUBLE_TYPE;
         }
         product *= op1.value;
@@ -531,15 +572,14 @@ RET_VAL pow_op(AST_NODE *oplist) {
 RET_VAL log_op(AST_NODE *oplist) {
     RET_VAL result;
     RET_VAL op1;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: log called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
     op1 = eval(oplist);
-    if(oplist->next != NULL){
+    if (oplist->next != NULL) {
         puts("WARNING: log called with extra (ignored) operands!");
     }
     result.type = DOUBLE_TYPE;
@@ -550,16 +590,14 @@ RET_VAL log_op(AST_NODE *oplist) {
 RET_VAL sqrt_op(AST_NODE *oplist) {
     RET_VAL result;
     RET_VAL op1;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: sqrt called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
     op1 = eval(oplist);
-    if(oplist->next != NULL)
-    {
+    if (oplist->next != NULL) {
         puts("WARNING: sqrt called with extra (ignored) operands!");
     }
     result.type = DOUBLE_TYPE;
@@ -570,16 +608,14 @@ RET_VAL sqrt_op(AST_NODE *oplist) {
 RET_VAL cbrt_op(AST_NODE *oplist) {
     RET_VAL result;
     RET_VAL op1;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: cbrt called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
         return result;
     }
     op1 = eval(oplist);
-    if(oplist->next != NULL)
-    {
+    if (oplist->next != NULL) {
         puts("WARNING: cbrt called with extra (ignored) operands!");
     }
     result.type = DOUBLE_TYPE;
@@ -590,8 +626,7 @@ RET_VAL cbrt_op(AST_NODE *oplist) {
 RET_VAL hypot_op(AST_NODE *oplist) {
     RET_VAL result;
     RET_VAL op1;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: hypot called with no operands, 0.0 returned!");
         result.type = DOUBLE_TYPE;
         result.value = 0;
@@ -601,8 +636,7 @@ RET_VAL hypot_op(AST_NODE *oplist) {
     AST_NODE *nextop = oplist;
     op1 = eval(nextop);
     double soq = op1.value * op1.value;
-    while(nextop->next != NULL)
-    {
+    while (nextop->next != NULL) {
         nextop = nextop->next;
         op1 = eval(nextop);
         soq += op1.value * op1.value;
@@ -616,8 +650,7 @@ RET_VAL max_op(AST_NODE *oplist) {
     RET_VAL result;
     RET_VAL op;
     double maxVal;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: max called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
@@ -627,13 +660,11 @@ RET_VAL max_op(AST_NODE *oplist) {
     op = eval(nextop);
     result.type = op.type;
     maxVal = op.value;
-    while(nextop->next != NULL)
-    {
+    while (nextop->next != NULL) {
 
         nextop = nextop->next;
         op = eval(nextop);
-        if(maxVal < op.value)
-        {
+        if (maxVal < op.value) {
             maxVal = op.value;
             result.type = op.type;
         }
@@ -646,8 +677,7 @@ RET_VAL min_op(AST_NODE *oplist) {
     RET_VAL result;
     RET_VAL op;
     double minVal;
-    if(oplist == NULL)
-    {
+    if (oplist == NULL) {
         puts("ERROR: min called with no operands!");
         result.type = INT_TYPE;
         result.value = NAN;
@@ -657,13 +687,11 @@ RET_VAL min_op(AST_NODE *oplist) {
     op = eval(nextop);
     result.type = op.type;
     minVal = op.value;
-    while(nextop->next != NULL)
-    {
+    while (nextop->next != NULL) {
 
         nextop = nextop->next;
         op = eval(nextop);
-        if(minVal > op.value)
-        {
+        if (minVal > op.value) {
             minVal = op.value;
             result.type = op.type;
         }
@@ -671,33 +699,51 @@ RET_VAL min_op(AST_NODE *oplist) {
     result.value = minVal;
     return result;
 }
+
 // Create Symbol Node- Receives a string from tokenizer
 // Sets node type and symbol id
-AST_NODE *createSymbolNode(char *id){
+AST_NODE *createSymbolNode(char *id) {
     AST_NODE *node;
     size_t nodeSize;
     nodeSize = sizeof(AST_NODE);
-    if ((node = calloc(nodeSize, 1)) == NULL)
+    if ((node = calloc(nodeSize, 1)) == NULL) {
         yyerror("Memory allocation failed!");
-
+    }
     node->type = SYM_NODE_TYPE;
     node->data.symbol.id = id;
-    free(id);
     return node;
 }
-// Hooks up pointer to records
-AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node){
-    node->symbolTable = record;
+
+// Receives a limked list of records and and ast node,
+// pointing the symbol table ptr at the list
+// then iterating over the list to set all the ast node value's parents to node
+AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node) {
+
+    if(record != NULL)
+    {
+        SYMBOL_TABLE_NODE *cRecord = record;
+        while(cRecord!=NULL)
+        {
+            if(cRecord->value != NULL)
+                cRecord->value->parent = node;
+            cRecord = cRecord->next;
+        }
+        node->symbolTable = record;
+    }
     return node;
+
 }
-// Adds newHead to list of sym table nodes
-AST_NODE *addRecordToList(SYMBOL_TABLE_NODE *newHead, SYMBOL_TABLE_NODE *list){
+
+
+// Adds newHead to head list of sym table nodes
+SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *list, SYMBOL_TABLE_NODE *newHead) {
     newHead->next = list;
     return newHead;
 }
+
 // Receives a string from SYMBOL token and creates an AST node
 // pointing *value at the argument node
-AST_NODE *createSymbolTableNode(char *id, AST_NODE *node){
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *id, AST_NODE *node) {
     SYMBOL_TABLE_NODE *tnode;
     size_t nodeSize;
     nodeSize = sizeof(SYMBOL_TABLE_NODE);
@@ -706,9 +752,13 @@ AST_NODE *createSymbolTableNode(char *id, AST_NODE *node){
 
     tnode->id = id;
     tnode->value = node;
-    return node;
+    return tnode;
 }
 
+// debug function
+void showme(SYMBOL_TABLE_NODE *stnode){
+    printf("%s, %lf\n", stnode->id, stnode->value->data.number.value);
+}
 
 
 

@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
     // Comment the line below to type inputs directly into the console.
     // Otherwise, they will be read from the file specified in the first program argument.
-    // freopen(argv[1], "r", stdin); input_from_file = 1;
+    freopen(argv[1], "r", stdin); input_from_file = 1;
 
     while(1) {
         if (!input_from_file)

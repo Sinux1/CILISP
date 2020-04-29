@@ -124,13 +124,13 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList);
 
 AST_NODE *createSymbolNode(char *id);
 
-AST_NODE *createSymbolTableNode(char *id, AST_NODE *node);
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *id, AST_NODE *node);
 
 AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node);
 
-AST_NODE *addOperandToList(AST_NODE *newHead, AST_NODE *list);
+SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *newNode, SYMBOL_TABLE_NODE *head);
 
-AST_NODE *addRecordToList(SYMBOL_TABLE_NODE *newHead, SYMBOL_TABLE_NODE *list);
+AST_NODE *addOperandToList(AST_NODE *newHead, AST_NODE *list);
 
 RET_VAL eval(AST_NODE *node);
 

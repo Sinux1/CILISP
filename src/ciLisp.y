@@ -61,7 +61,7 @@ s_expr:
     |
     LPAREN let_section s_expr RPAREN {
     ylog(s_expr,LPAR let_section s_expr RPAR );
-    $$ == assignSymbolTable($2, $3);
+    $$ = assignSymbolTable($2, $3);
 
     }
     | QUIT {
@@ -107,7 +107,7 @@ let_section:
 	};
 
 let_list:
-	let_elem let_list {
+	let_list let_elem {
 	ylog(let_list, let_elem let_list);
 	$$ = addRecordToList($1, $2);
 	}
