@@ -102,13 +102,18 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList) {
 
     // Assign reference to oplist
     node->data.function.opList = opList;
-    AST_NODE *lnode = node->data.function.opList;
+    // Make sure there is an oplist before trying to set parents
+    if(opList != NULL)
+    {
+        AST_NODE *lnode = node->data.function.opList;
 
-    // Assign every operand in oplist the same parent - the AST_NODE being returned
-    lnode->parent = node;
-    while (lnode->next != NULL) {
-        lnode = lnode->next;
+        // Assign every operand in oplist the same parent - the AST_NODE being returned
         lnode->parent = node;
+        while (lnode->next != NULL) {
+            lnode = lnode->next;
+            lnode->parent = node;
+        }
+
     }
 
     // Assign function operation, using assignment return value to test if custom op,
