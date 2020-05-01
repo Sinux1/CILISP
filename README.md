@@ -1,10 +1,19 @@
 # CiLisp
-
+## Completed:
 #### Task 1 ::= CPN Calculator 
-This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for the grammar of a lisp like language for evaluating expressions in CNP form.  
+This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for the grammar of a lisp like language for evaluating expressions in CNP form.    
+
+#### Task 2 ::= CPN Calculator featuring Symbols  
+This task required adding to both the flex and bison files. Symbols must be composed of one or more alphabetical characters. 
+No other characters are allowed. Assignment is dane by the let expression. The key word `let` signifies the following ordered 
+pairs `(Symbol s_expr)` is semantically equivelant to `Symbol = s_expr`    
 
 ---
-**noteable**:  
+#_Noteable_:  
+* The expression `(123)` was invalid for task 1, but is valid from task 2 forward.  
+* All input tested is collected in two files, `allBadInput.ciLisp` and `allValidInput.ciLisp` found in `inputs/`  
+
+#### Task 1  
 - I had to add a production for _s_expr_list_ to handle the instance when no operand is provided. 
 - A production was added to _program_ for the case when there is no instruction. In an input file, this is represented by a blank line.    
 - Added \v and \r to the lex file for ignoring whitespace.  
@@ -13,12 +22,43 @@ This is the first task. It required completing both the lex and yacc files, as w
 - I make frequent use of the ternary operator. When unclear, I comment.  
 - For division by 0, I have chosen to return nan without throwing an error or warning. nan is enough of a warning. There was no explicit instruction for divide by zero error in function implementation description, so I took my own liberty.  
 - The file `/inputs/allValidTestInputs.txt` is a running collection of valid inputs that will continue to be added to and tested through all tasks in this lab.  
----
----  
 
-## Run 1 : valid input 
-Input in `/inputs/input1.txt` was collected from Task 1 example sample runs and includes other inputs that I wanted to test to make sure things like whitespace were correctly ignored, and that when nested functions threw an error, the rest of the function completed correctly. Such as when a call to sub with no operands was nested deep in other functions, the output should only be the error warning followed by NAN, or whatever the correct output is supposed to be paired with the specific warning.  
-#### `input1.txt`  
+---
+#### Task 2
+* The underlying data structure of an AST node was added to. In task 1, each AST node had a `type`, `*data`, and `*next` values. 
+This allowed them to be used as linked lists, and when evaluating an AST node, all of the information for that evaluation 
+could be found in the data pointed to by the `data` pointer and the value of `type`. Now in this task, the AST node 
+structure needed the addition of parent and symbol table pointers. `symbolTable` points to a linked list of symbol table 
+nodes (`let_list`), and `parent` points to its parent AST node on the parse tree. Now, when evaluating an AST node, data 
+found in that node's symbol table or the symbol table of any of its parent nodes may be used.  
+* The following functionality was added, function definitions can be found in `ciLisp.c`  
+    * To create a symbol node from the string value of a symbol token.  
+    `AST_NODE *createSymbolNode(char *id);`  
+    * To point the `symbolTable` pointer to the linked list of symbol table nodes representing a `let_section`.  
+     `AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node);`  
+    * To add a symbol table node to the linked list of symbol table nodes, the rightmost `let_elem` in a `let_list` is the head.  
+    `SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *list, SYMBOL_TABLE_NODE *newHead);`  
+    * To create a symbol table node whose `id` points the string value of the symbol token and `value` points to 
+    the AST node representing the s_expr token of a `let_elem` production.  
+    `SYMBOL_TABLE_NODE *createSymbolTableNode(char *id, AST_NODE *node);`  
+    * For evaluation of a symbol node.  
+    `RET_VAL evalSymbolNode(AST_NODE *node)`  
+* `RET_VAL eval(AST_NODE *node)` was modified to call `evalSymbolNode(AST_NODE *node)` when passed a symbol node.  
+* In `evalSymbolNode(AST_NODE *node)`, the character string pointed to by `node->id` is compared against the `id` of every 
+symbol table node in that node's `symbolTable`, and if a match is not found, or the table is `NULL`, it checks the symbol table 
+of it's parent node. This is continued until a match is found or `parent` is `NULL`. If no match is found, an `Undefined 
+Symbol` errror is thrown and `nan` is returned. If a match is found, the node `value` pointer of that symbol table node 
+is evaluated and returned.  
+
+---    
+# Test Runs  
+## Task 1  
+### Run 1 : valid input 
+Input in `/inputs/input1.txt` was collected from Task 1 example sample runs and includes other inputs that I wanted to 
+test to make sure things like whitespace were correctly ignored, and that when nested functions threw an error, the rest 
+of the function completed correctly. Such as when a call to sub with no operands was nested deep in other functions, the 
+output should only be the error warning followed by NAN, or whatever the correct output is supposed to be paired with the 
+specific warning.  
 ```
 (neg 5)
 
@@ -399,10 +439,9 @@ WARNING: sub called with extra (ignored) operands!
 INTEGER: 1
 
 Process finished with exit code 0
-
 ```
 ---
-## Run 2 : invalid inputs
+### Run 2 : invalid inputs
 Input in `/inputs/badinput1.txt` are instructions I tested that I knew to be invalid, and were all correctly rejected.  
 ```
 ()
@@ -424,5 +463,71 @@ Process finished with exit code 1
 ```
 ---  
 ---
-### Known Bugs
+
 - When input is read from file, the outputs are printed to console, but the string representation of the original instruction are not. I tried to add a few lines of code to main in `ciLisp.l` but it didn't work. I suspect reading from the input stream prior to the call to yyparse() will be a problem, but I couldn't seem to get even that far.  
+## Task 2
+### Run 1: valid input
+Input in `/inputs/input2.txt` was collected from Task 1 example sample runs and includes other expressions to test various 
+nestings and to be sure that the symbol tables and parent nodes were implemented correctly programmatically. For example, 
+when evaluating a symbol node, the value of the most recent definition is used, or the successful evaluation of a 
+parenthesized s_expr with a `NULL` let_section.  
+```
+( (let (x 1) ) x )
+(add ((let (abc 1)) (sub 3 abc)) 4)
+(mult ((let (a 1) (b 2)) (add a b)) (sqrt 2))
+(add ((let (a ((let (b 2)) (mult b (sqrt 10))))) (div a 2)) ((let (c 5)) (sqrt c)))
+((let (first (sub 5 1)) (second 2)) (add (pow 2 first) (sqrt second)))
+((let (abc 1)) (sub ((let (abc 2) (de 3)) (add abc de)) abc))
+((let (x 3) (x 30)) (add ((let (x 10) (x 100)) x) x))
+((let (abc 1)) (sub ((let (abc 2)) (add abc de)) abc))
+((let (x 1)) y)
+(1)
+((let (x 1)     (x 3) (x 5) (y 10)) (add x ((let (x 10)) (add x (neg y)))))
+((let (x 1)     (x 3)  (y 10) (x 5)) (add x ((let (x 10)) (add x (neg y)))))
+QUIT
+quit
+```
+### Run 1: output
+```
+INTEGER: 1
+INTEGER: 6
+DOUBLE: 4.242641
+DOUBLE: 5.398346
+DOUBLE: 17.414214
+INTEGER: 4
+INTEGER: 130
+Undefined Symbol!
+INTEGER: nan
+Undefined Symbol!
+INTEGER: nan
+INTEGER: 1
+INTEGER: 5
+Undefined Symbol!
+INTEGER: nan
+
+Process finished with exit code 0
+```
+### Run 2: invalid input
+Input in `/inputs/badinput2.txt` are instructions I tested that I knew to be invalid, and were all correctly rejected.  
+```
+((let (x 1)) (add y ((let (y 1)) x)))
+()
+((let ()) 1)
+((let ) 1)
+((let (abc1d 1)) 1)
+(((((((1)))))))
+(2 3)
+```
+### Run 2: output
+Each invalid input correctly threw this error.  
+```
+
+ERROR: syntax error
+
+Process finished with exit code 1
+
+```
+---
+# Known Bugs
+None
+--- 
