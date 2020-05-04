@@ -12,6 +12,7 @@ digit [0-9]
 int [+-]?{digit}+
 dbl [+-]?{digit}+\.{digit}+
 let "let"
+type "int"|"double"
 func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"sqrt"|"cbrt"|"hypot"|"max"|"min"|"print"|"read"|"equal"|"less"|"greater"
 sym [a-zA-Z]+
 
@@ -43,6 +44,13 @@ sym [a-zA-Z]+
 {let} {
     llog(LET);
     return LET;
+}
+
+{type} {
+    llog(TYPE);
+    yylval.sval = (char *) calloc(sizeof(char), strlen(yytext) + 1);
+    strcpy(yylval.sval, yytext);
+    return TYPE;
 }
 
 {sym} {

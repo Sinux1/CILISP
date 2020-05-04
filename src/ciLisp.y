@@ -10,7 +10,7 @@
     struct symbol_table_node *stNode;
 }
 
-%token <sval> FUNC SYMBOL
+%token <sval> FUNC SYMBOL TYPE
 %token <dval> INT DOUBLE
 %token LPAREN RPAREN EOL QUIT EOFT LET
 
@@ -62,7 +62,6 @@ s_expr:
     LPAREN let_section s_expr RPAREN {
     ylog(s_expr,LPAR let_section s_expr RPAR );
     $$ = assignSymbolTable($2, $3);
-
     }
     | QUIT {
         ylog(s_expr, QUIT);
@@ -120,8 +119,13 @@ let_list:
 let_elem:
 	LPAREN SYMBOL s_expr RPAREN {
 	ylog(let_elem, LPAR SYMBOL s_expr RPAR);
-	$$ = createSymbolTableNode($2, $3);
+	$$ = createSymbolTableNode(NULL, $2, $3);
 	}
+	|
+	LPAREN TYPE SYMBOL s_expr RPAREN {
+        ylog(let_elem, LPAR SYMBOL s_expr RPAR);
+        $$ = createSymbolTableNode($2, $3, $4);
+        }
 
 number:
     INT {

@@ -17,6 +17,7 @@
 
 #define DEFAULT_RET_VAL (RET_VAL){INT_TYPE, NAN}
 
+
 FILE *flex_bison_log_file;
 
 int yyparse(void);
@@ -59,7 +60,8 @@ OPER_TYPE resolveFunc(char *);
 // Types of numeric values
 typedef enum {
     INT_TYPE,
-    DOUBLE_TYPE
+    DOUBLE_TYPE,
+    NO_TYPE
 } NUM_TYPE;
 
 // Node to store a number.
@@ -74,7 +76,7 @@ typedef struct {
 typedef NUM_AST_NODE RET_VAL;
 
 typedef struct {
-    char* id;
+    char *id;
 } SYM_AST_NODE;
 
 
@@ -111,6 +113,7 @@ typedef struct ast_node {
 
 
 typedef struct symbol_table_node {
+    NUM_TYPE type;
     char *id;
     AST_NODE *value;
     // SYMBOL_TYPE symbolType;
@@ -124,7 +127,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList);
 
 AST_NODE *createSymbolNode(char *id);
 
-SYMBOL_TABLE_NODE *createSymbolTableNode(char *id, AST_NODE *node);
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *type, char *id, AST_NODE *node);
 
 AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node);
 
@@ -137,36 +140,37 @@ RET_VAL eval(AST_NODE *node);
 void printRetVal(RET_VAL val);
 
 void freeNode(AST_NODE *node);
+
 RET_VAL neg_op(AST_NODE *);
 
-RET_VAL abs_op(AST_NODE*);
+RET_VAL abs_op(AST_NODE *);
 
-RET_VAL add_op(AST_NODE*);
+RET_VAL add_op(AST_NODE *);
 
-RET_VAL sub_op(AST_NODE*);
+RET_VAL sub_op(AST_NODE *);
 
-RET_VAL mult_op(AST_NODE*);
+RET_VAL mult_op(AST_NODE *);
 
-RET_VAL div_op(AST_NODE*);
+RET_VAL div_op(AST_NODE *);
 
-RET_VAL remaind_op(AST_NODE*);
+RET_VAL remaind_op(AST_NODE *);
 
-RET_VAL exp_op(AST_NODE*);
+RET_VAL exp_op(AST_NODE *);
 
-RET_VAL exp2_op(AST_NODE*);
+RET_VAL exp2_op(AST_NODE *);
 
-RET_VAL pow_op(AST_NODE*);
+RET_VAL pow_op(AST_NODE *);
 
-RET_VAL log_op(AST_NODE*);
+RET_VAL log_op(AST_NODE *);
 
-RET_VAL sqrt_op(AST_NODE*);
+RET_VAL sqrt_op(AST_NODE *);
 
-RET_VAL cbrt_op(AST_NODE*);
+RET_VAL cbrt_op(AST_NODE *);
 
-RET_VAL hypot_op(AST_NODE*);
+RET_VAL hypot_op(AST_NODE *);
 
-RET_VAL max_op(AST_NODE*);
+RET_VAL max_op(AST_NODE *);
 
-RET_VAL min_op(AST_NODE*);
+RET_VAL min_op(AST_NODE *);
 
 #endif

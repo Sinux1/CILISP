@@ -14,6 +14,11 @@ void printWarning(char *s) {
     fprintf(stdout, "\nWARNING: %s\n", s);
 }
 
+char *typeNames[] = {
+        "int",
+        "double"
+};
+
 // Array of string values for operations.
 // Must be in sync with funcs in the OPER_TYPE enum in order for resolveFunc to work.
 char *funcNames[] = {
@@ -103,8 +108,7 @@ AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList) {
     // Assign reference to oplist
     node->data.function.opList = opList;
     // Make sure there is an oplist before trying to set parents
-    if(opList != NULL)
-    {
+    if (opList != NULL) {
         AST_NODE *lnode = node->data.function.opList;
 
         // Assign every operand in oplist the same parent - the AST_NODE being returned
@@ -231,8 +235,7 @@ RET_VAL evalFuncNode(AST_NODE *node) {
     return result;
 }
 
-RET_VAL evalSymbolNode(AST_NODE *node)
-{
+RET_VAL evalSymbolNode(AST_NODE *node) {
     // Symbol we are looking for
     char *sid = node->data.symbol.id;
     // searching the most recent scope first
@@ -243,28 +246,36 @@ RET_VAL evalSymbolNode(AST_NODE *node)
     SYMBOL_TABLE_NODE *record;
     // If symbol never resolves, initialize default value
     RET_VAL result = DEFAULT_RET_VAL;
-    do{
+    do {
         // Initialize table and record
         table = parent->symbolTable;
         record = table;
         // Iterate over table comparing record to sid
-        while(record != NULL)
-        {
+        while (record != NULL) {
             // Condition resolves to 0 (False) when strings are equal
             // so !(strcmp()) will resolve to true when equal
-            if(!(strcmp(record->id, sid)))
-            {
+            if (!(strcmp(record->id, sid))) {
                 // call to eval will resolve the value node
                 result = eval(record->value);
+                if(record->type != NO_TYPE)
+                {
+                    if(record->type == INT_TYPE && result.type == DOUBLE_TYPE)
+                    {
+                        printf("WARNING: precision loss on int cast from %g to %d for variable %s.\n",
+                                result.value, (int)result.value, sid);
+                    }
+                    result.type = record->type;
+                }
                 return result;
             }
             record = record->next;
 
         }
         parent = parent->parent;
-    }while(parent != NULL);
+    } while (parent != NULL);
     // If the next line executes it is because the symbol was not found in the table
     puts("Undefined Symbol!");
+
     return result;
 }
 
@@ -724,12 +735,10 @@ AST_NODE *createSymbolNode(char *id) {
 // then iterating over the list to set all the ast node value's parents to node
 AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node) {
 
-    if(record != NULL)
-    {
+    if (record != NULL) {
         SYMBOL_TABLE_NODE *cRecord = record;
-        while(cRecord!=NULL)
-        {
-            if(cRecord->value != NULL)
+        while (cRecord != NULL) {
+            if (cRecord->value != NULL)
                 cRecord->value->parent = node;
             cRecord = cRecord->next;
         }
@@ -748,20 +757,36 @@ SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *list, SYMBOL_TABLE_NODE *n
 
 // Receives a string from SYMBOL token and creates an AST node
 // pointing *value at the argument node
-SYMBOL_TABLE_NODE *createSymbolTableNode(char *id, AST_NODE *node) {
+SYMBOL_TABLE_NODE *createSymbolTableNode(char *type, char *id, AST_NODE *node) {
     SYMBOL_TABLE_NODE *tnode;
     size_t nodeSize;
     nodeSize = sizeof(SYMBOL_TABLE_NODE);
     if ((tnode = calloc(nodeSize, 1)) == NULL)
         yyerror("Memory allocation failed!");
 
+    if(type == NULL)
+    {
+        tnode->type = NO_TYPE;
+    }
+    else{
+        tnode->type = (strcmp(type, typeNames[INT_TYPE]) == 0)? INT_TYPE: DOUBLE_TYPE;
+    }
+
+
     tnode->id = id;
     tnode->value = node;
+
+    // Using ternary, strcmp evaluates to 0 if strings are same.
+    // So negating the 0 will evaluate to positive if type is int,
+    // and will assign INT_TYPE to tnode-> type, otherwise a nested ternary
+    // will check if it is a double, assigning double type, otherwise no type.
+
+
     return tnode;
 }
 
 // debug function
-void showme(SYMBOL_TABLE_NODE *stnode){
+void showme(SYMBOL_TABLE_NODE *stnode) {
     printf("%s, %lf\n", stnode->id, stnode->value->data.number.value);
 }
 
