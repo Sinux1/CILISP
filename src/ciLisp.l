@@ -16,6 +16,7 @@ type "int"|"double"
 func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"sqrt"|"cbrt"|"hypot"|"max"|"min"|"print"|"read"|"equal"|"less"|"greater"
 sym [a-zA-Z]+
 
+
 %%
 
 "quit" {
@@ -85,6 +86,7 @@ sym [a-zA-Z]+
 
 . { // anything else
     llog(INVALID);
+    printf("ERROR: invalid character: >>%s<<\n", yytext);
     }
 
 %%

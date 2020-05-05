@@ -1,3 +1,7 @@
+((let (int a 1.25))(add a 1))
+((let (double a 5))(add a .25))
+((let (double a 5))(add a 0.25))
+
 ( (let (double x 1) ) x )
 (add ((let (double abc 1)) (sub 3 abc)) 4)
 (mult ((let (a 1) (int b 2.5)) (add a b)) (sqrt 2))
@@ -11,7 +15,8 @@
 ((let (x 1)     (x 3) (x 5) (double y 10)) (add x ((let (x 10)) (add x (neg y)))))
 ((let (x 1)     (double x 3)  (y 10) (x 5)) (add x ((let (x 10)) (add x (neg y)))))
 QUIT
+(add ((let (double x 1)) x) ((let (y 10)) x))
 quit
 
-(add ((let (double x 1)) x) ((let (y 10)) x))
+
 
