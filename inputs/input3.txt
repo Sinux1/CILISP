@@ -17,6 +17,3 @@
 QUIT
 (add ((let (double x 1)) x) ((let (y 10)) x))
 quit
-
-
-

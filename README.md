@@ -51,6 +51,12 @@ Symbol` errror is thrown and `nan` is returned. If a match is found, the node `v
 is evaluated and returned.  
 
 ---    
+
+
+#### Task 3  
+- There is nothing exceptionally notable except the inclusion ow a warning for invalid characters. 
+- Very little was changed from task 2 to task 3, so bad inputs for testing task 3 functionality was minimal.  
+---
 # Test Runs  
 ## Task 1  
 ### Run 1 : valid input 
@@ -462,9 +468,7 @@ Process finished with exit code 1
 
 ```
 ---  
----
 
-- When input is read from file, the outputs are printed to console, but the string representation of the original instruction are not. I tried to add a few lines of code to main in `ciLisp.l` but it didn't work. I suspect reading from the input stream prior to the call to yyparse() will be a problem, but I couldn't seem to get even that far.  
 ## Task 2
 ### Run 1: valid input
 Input in `/inputs/input2.txt` was collected from Task 1 example sample runs and includes other expressions to test various 
@@ -528,6 +532,81 @@ Process finished with exit code 1
 
 ```
 ---
-# Known Bugs
+## Task 3  
+### Run 1 : valid input  
+Input from `../inputs/validInput3.txt` is pulled from the sample runs in the task instructions, and from task 2 valid 
+input, except modified by adding a cast to at least one let_elem in every instruction. All output is valid.  
+``` 
+((let (int a 1.25))(add a 1))
+((let (double a 5))(add a .25))
+((let (double a 5))(add a 0.25))
+
+( (let (double x 1) ) x )
+(add ((let (double abc 1)) (sub 3 abc)) 4)
+(mult ((let (a 1) (int b 2.5)) (add a b)) (sqrt 2))
+(add ((let (int a ((let (b 2)) (mult b (sqrt 10))))) (div a 2)) ((let (c 5)) (sqrt c)))
+((let (first (sub 5 1)) (second 2)) (add (pow 2 first) (sqrt second)))
+((let (double abc 1)) (sub ((let (abc 2) (de 3)) (add abc de)) abc))
+((let (x 3) (x 30)) (add ((let (x 10) (double x 100)) x) x))
+((let (int abc 1)) (sub ((let (double abc 2)) (add abc de)) abc))
+((let (double x 1)) y)
+(1)
+((let (x 1)     (x 3) (x 5) (double y 10)) (add x ((let (x 10)) (add x (neg y)))))
+((let (x 1)     (double x 3)  (y 10) (x 5)) (add x ((let (x 10)) (add x (neg y)))))
+QUIT
+(add ((let (double x 1)) x) ((let (y 10)) x))
+quit
+```
+### Run 1: output  
+```
+
+WARNING: precision loss on int cast from 1.25 to 1 for variable a.
+INTEGER: 2
+ERROR: invalid character: >>.<<
+DOUBLE: 30.000000
+DOUBLE: 5.250000
+DOUBLE: 1.000000
+DOUBLE: 6.000000
+WARNING: precision loss on int cast from 2.5 to 2 for variable b.
+DOUBLE: 4.949747
+WARNING: precision loss on int cast from 6.32456 to 6 for variable a.
+DOUBLE: 5.398346
+DOUBLE: 17.414214
+DOUBLE: 4.000000
+DOUBLE: 130.000000
+Undefined Symbol!
+INTEGER: nan
+Undefined Symbol!
+INTEGER: nan
+INTEGER: 1
+DOUBLE: 5.000000
+INTEGER: 5
+Undefined Symbol!
+INTEGER: nan
+Undefined Symbol!
+INTEGER: nan
+
+Process finished with exit code 0
+
+``` 
+ 
+---
+### Run 2 : bad input
+
+``` 
+((let (int double a 1.25))(add a 1))
+((let (int a 1.25))(add double a 1))
+```
+### Run 2 : output  
+Every bad input threw the following error correctly.
+``` 
+ERROR: syntax error
+
+Process finished with exit code 1
+
+```
+--- 
+# Known Bugs  
 None
+
 --- 
