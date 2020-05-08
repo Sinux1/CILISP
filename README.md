@@ -1,42 +1,60 @@
 # CiLisp
-## Completed:
+## Summary  
 #### Task 1 ::= CPN Calculator 
-This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for the grammar of a lisp like language for evaluating expressions in CNP form.    
-
+This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for 
+the grammar of a lisp like language for evaluating expressions in CNP form, that is as an n-tuple, first element is an 
+operation, subsequent elements are operands. Further functionality will be added in subsequent tasks.    
+---
 #### Task 2 ::= CPN Calculator featuring Symbols  
 This task required adding to both the flex and bison files. Symbols must be composed of one or more alphabetical characters. 
 No other characters are allowed. Assignment is dane by the let expression. The key word `let` signifies the following ordered 
-pairs `(Symbol s_expr)` is semantically equivelant to `Symbol = s_expr`    
+pairs `(Symbol s_expr)` is semantically equivelant to `Symbol = s_expr`.    
+---
+#### Task 3 ::= CPN Calculator with Symbols featuring Symbol Casting  
+This task added the ability to cast a symbol value to int or double, regardless of what the symbol node evaluates to. 
+This required an additional production to `let_section` in yacc file, and the addition of key words `int` and `double` in 
+the lex file. 
+---
+#### Task 4 ::= CPN Calculator with Symbol Casting featuring Conditionals and Additional Functions  
+This requires the definition of additional functions to CPN calculator, and additional productions and key words 
+for conditionals in the lex and yacc files.
 
 ---
-#_Noteable_:  
+
+   
+##_Noteable_:  
 * The expression `(123)` was invalid for task 1, but is valid from task 2 forward.  
 * All input tested is collected in two files, `allBadInput.ciLisp` and `allValidInput.ciLisp` found in `inputs/`  
 
-#### Task 1  
+#### Task 1 
 - I had to add a production for _s_expr_list_ to handle the instance when no operand is provided. 
-- A production was added to _program_ for the case when there is no instruction. In an input file, this is represented by a blank line.    
+- A production was added to _program_ for the case when there is no instruction. In an input file, this is represented by 
+a blank line.    
 - Added \v and \r to the lex file for ignoring whitespace.  
-- Originally I had written the math op functions to use recursion, but I could not figure out how to accuratly track return type through recursive calls, but I could easily do it iterating through the linked oplist.    
+- Originally I had written the math op functions to use recursion, but I could not figure out how to accuratly track 
+return type through recursive calls, but I could easily do it iterating through the linked oplist.    
 - Called freeNode($1) after execution is done on base of tree, to free memory and satisfy the Valgrind monster.  
 - I make frequent use of the ternary operator. When unclear, I comment.  
-- For division by 0, I have chosen to return nan without throwing an error or warning. nan is enough of a warning. There was no explicit instruction for divide by zero error in function implementation description, so I took my own liberty.  
-- The file `/inputs/allValidTestInputs.txt` is a running collection of valid inputs that will continue to be added to and tested through all tasks in this lab.  
+- For division by 0, I have chosen to return nan without throwing an error or warning. nan is enough of a warning. There 
+was no explicit instruction for divide by zero error in function implementation description, so I took my own liberty.  
+- The file `/inputs/allValidTestInputs.txt` is a running collection of valid inputs that will continue to be added to 
+and tested through all tasks in this lab.  
 
 ---
 #### Task 2
-* The underlying data structure of an AST node was added to. In task 1, each AST node had a `type`, `*data`, and `*next` values. 
-This allowed them to be used as linked lists, and when evaluating an AST node, all of the information for that evaluation 
-could be found in the data pointed to by the `data` pointer and the value of `type`. Now in this task, the AST node 
-structure needed the addition of parent and symbol table pointers. `symbolTable` points to a linked list of symbol table 
-nodes (`let_list`), and `parent` points to its parent AST node on the parse tree. Now, when evaluating an AST node, data 
-found in that node's symbol table or the symbol table of any of its parent nodes may be used.  
+* The underlying data structure of an AST node was added to. In task 1, each AST node had a `type`, `*data`, and `*next` 
+values. This allowed them to be used as linked lists, and when evaluating an AST node, all of the information for that 
+evaluation could be found in the data pointed to by the `data` pointer and the value of `type`. Now in this task, the AST 
+node structure needed the addition of parent and symbol table pointers. `symbolTable` points to a linked list of symbol 
+table nodes (`let_list`), and `parent` points to its parent AST node on the parse tree. Now, when evaluating an AST node, 
+data found in that node's symbol table or the symbol table of any of its parent nodes may be used.  
 * The following functionality was added, function definitions can be found in `ciLisp.c`  
     * To create a symbol node from the string value of a symbol token.  
     `AST_NODE *createSymbolNode(char *id);`  
     * To point the `symbolTable` pointer to the linked list of symbol table nodes representing a `let_section`.  
      `AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node);`  
-    * To add a symbol table node to the linked list of symbol table nodes, the rightmost `let_elem` in a `let_list` is the head.  
+    * To add a symbol table node to the linked list of symbol table nodes, the rightmost `let_elem` in a `let_list` is 
+    the head.  
     `SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *list, SYMBOL_TABLE_NODE *newHead);`  
     * To create a symbol table node whose `id` points the string value of the symbol token and `value` points to 
     the AST node representing the s_expr token of a `let_elem` production.  
@@ -45,20 +63,26 @@ found in that node's symbol table or the symbol table of any of its parent nodes
     `RET_VAL evalSymbolNode(AST_NODE *node)`  
 * `RET_VAL eval(AST_NODE *node)` was modified to call `evalSymbolNode(AST_NODE *node)` when passed a symbol node.  
 * In `evalSymbolNode(AST_NODE *node)`, the character string pointed to by `node->id` is compared against the `id` of every 
-symbol table node in that node's `symbolTable`, and if a match is not found, or the table is `NULL`, it checks the symbol table 
-of it's parent node. This is continued until a match is found or `parent` is `NULL`. If no match is found, an `Undefined 
-Symbol` errror is thrown and `nan` is returned. If a match is found, the node `value` pointer of that symbol table node 
-is evaluated and returned.  
+symbol table node in that node's `symbolTable`, and if a match is not found, or the table is `NULL`, it checks the symbol 
+table of it's parent node. This is continued until a match is found or `parent` is `NULL`. If no match is found, an 
+`Undefined Symbol` error is thrown and `nan` is returned. If a match is found, the node `value` pointer of that symbol 
+table node is evaluated and returned.  
 
 ---    
-
-
 #### Task 3  
-- There is nothing exceptionally notable except the inclusion ow a warning for invalid characters. 
-- Very little was changed from task 2 to task 3, so bad inputs for testing task 3 functionality was minimal.  
+- There is now a warning for invalid characters per sample run example.    
+- Very little was changed from task 2 to task 3, so bad inputs for testing task 3 functionality are minimal.  
 ---
-# Test Runs  
-## Task 1  
+#### Task 4
+- I tested the precision of the equal operation by comparing 0 to 0.000...1 with increasing number of decimal digits 
+until the comparison returned true, and found that this implementation, on my development PC, will return true when the 
+number of zeroes that follow the decimal, preceding the last 1, is 322. That is, 322 zeroes and a 1 after the decimal is 
+considered 0 and when compared to 0 will evaluate to true.
+- Any instruction containing a read function is always executed from stdin, and is never redirected from a file.  
+---
+
+# Sample Runs 
+## Task 1   
 ### Run 1 : valid input 
 Input in `/inputs/input1.txt` was collected from Task 1 example sample runs and includes other inputs that I wanted to 
 test to make sure things like whitespace were correctly ignored, and that when nested functions threw an error, the rest 
@@ -589,15 +613,136 @@ INTEGER: nan
 Process finished with exit code 0
 
 ``` 
- 
----
-### Run 2 : bad input
-
-``` 
-((let (int double a 1.25))(add a 1))
-((let (int a 1.25))(add double a 1))
+## Task 4
+### Run 1 : valid input
+Input file `../inputs/input4.txt` begins with several calls to rand to test correct seeding of rand function, and it 
+contains all sample runs as well as additional instructions crafted to test proper functionality of more complicated 
+instructions, such as `(add ((let (x 1) (y (cond 1 (print 1 2 3 (rand)) (print (rand)) ) ) ) y ) 1)`, which is an 
+instruction that caused a very confusing memory leak that has been now fixed, and `(add 1 (print 2) (cond 0 (print 
+(rand) (rand) (rand) (rand) (rand)) 3 ) )`, which should not/ does not evaluate any of the calls to rand nested in the
+print function, since the condition is false.  
 ```
-### Run 2 : output  
+(rand)
+(rand)
+(rand)
+(rand)
+(rand)
+(rand)
+(rand)
+(rand)
+(rand)
+(add ((let (x 1) (y (cond 1 (print 1 2 3 (rand)) (print (rand)) ) ) ) y ) 1)
+(print 1)
+(equal 0 0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001)
+
+(add 1 (print 2) (cond 0 (print (rand) (rand) (rand) (rand) (rand)) 3 ) )
+(add 1 (print 2 3 4 (rand)) )
+
+( ( let (x (rand)) ) (add (print x) (print x) ) )
+(equal 0 0)
+(print 0 2.0 0.0)
+((let (is 15)) (equal ((let (this 15) (is 150)) this) is))
+(less 0 0)
+(less -1 0)
+(less 0 -1.0)
+(greater -30000000 30000000)
+(greater (print 1 2 3 0) 0)
+(greater 0 0.0)
+( ( let (x 0) (y 1) ) (less x y) )
+```
+### Run 1 : output
+```
+DOUBLE: 0.102750
+DOUBLE: 0.513107
+DOUBLE: 0.572894
+DOUBLE: 0.646519
+DOUBLE: 0.791061
+DOUBLE: 0.479726
+DOUBLE: 0.174375
+DOUBLE: 0.142548
+DOUBLE: 0.303393
+INTEGER : 1
+INTEGER : 2
+INTEGER : 3
+DOUBLE : 0.541883
+DOUBLE: 1.541883
+INTEGER : 1
+INTEGER : 1
+INTEGER : 0
+INTEGER : 2
+INTEGER : 6
+INTEGER : 2
+INTEGER : 3
+INTEGER : 4
+DOUBLE : 0.975509
+DOUBLE: 1.975509
+DOUBLE : 0.889982
+DOUBLE : 0.889982
+DOUBLE: 1.779964
+INTEGER : 1
+INTEGER : 0
+DOUBLE : 2.000000
+DOUBLE : 0.000000
+DOUBLE: 0.000000
+INTEGER : 1
+INTEGER : 0
+INTEGER : 1
+INTEGER : 0
+INTEGER : 0
+INTEGER : 1
+INTEGER : 2
+INTEGER : 3
+INTEGER : 0
+INTEGER : 0
+INTEGER : 0
+INTEGER : 1
+
+Process finished with exit code 0
+
+```
+### Run 2 : valid read instructions
+The following instructions and outputs are the result of manually typing them into the terminal, and can be found in 
+`/inputs/validReadInstructions.txt`.
+```
+> ( ( let (x (read)) ) (print x) )
+( ( let (x (read)) ) (print x) )
+read :: 1
+1
+INTEGER : 1
+INTEGER : 1
+> ( ( let (x (read)) (y (read)) ) (print x x y y) )
+( ( let (x (read)) (y (read)) ) (print x x y y) )
+read :: 1
+1
+read :: 2
+2
+INTEGER : 1
+INTEGER : 1
+INTEGER : 2
+INTEGER : 2
+INTEGER : 2
+> (add ((let (double x 1) (y (cond 1 (print 1 2 3 (rand)) (print (rand)) ) ) ) y ) (read))
+(add ((let (double x 1) (y (cond 1 (print 1 2 3 (rand)) (print (rand)) ) ) ) y ) (read))
+INTEGER : 1
+INTEGER : 2
+INTEGER : 3
+DOUBLE : 0.364077
+read :: 666
+666
+DOUBLE: 666.364077
+> quit
+quit
+
+Process finished with exit code 0
+
+```
+
+
+### Run 3: invalid inputs
+```
+
+```
+### Run 3 : output  
 Every bad input threw the following error correctly.
 ``` 
 ERROR: syntax error
@@ -606,7 +751,13 @@ Process finished with exit code 1
 
 ```
 --- 
-# Known Bugs  
-None
+
+# Known Bugs 
+- Valgrind complains of UninitConditions and UninitValues when running read instructions from command line, but the 
+location is deep inside files I did not edit. I made every attempt at tracking the cause, but to no avail.  
+![](./figures/valgrindtask4.png) 
+- Instructions from file (when stdin is redirected with freopen) are not echoed to console. 
+- The read function can only be called from stdin without redirection with freopen. Any attempt to use read from input 
+file will result in undefined behavior.
 
 --- 

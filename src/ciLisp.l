@@ -13,7 +13,8 @@ int [+-]?{digit}+
 dbl [+-]?{digit}+\.{digit}+
 let "let"
 type "int"|"double"
-func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"sqrt"|"cbrt"|"hypot"|"max"|"min"|"print"|"read"|"equal"|"less"|"greater"
+cond "cond"
+func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"sqrt"|"cbrt"|"hypot"|"max"|"min"|"print"|"read"|"equal"|"less"|"greater"|"rand"|"equal"|"less"|"greater"
 sym [a-zA-Z]+
 
 
@@ -47,12 +48,19 @@ sym [a-zA-Z]+
     return LET;
 }
 
+{cond} {
+    llog(COND);
+    return COND;
+    }
+
 {type} {
     llog(TYPE);
     yylval.sval = (char *) calloc(sizeof(char), strlen(yytext) + 1);
     strcpy(yylval.sval, yytext);
     return TYPE;
 }
+
+
 
 {sym} {
     llog(SYMBOL);
@@ -102,10 +110,11 @@ int main(int argc, char **argv)
 {
     int input_from_file = 0;
     flex_bison_log_file = fopen(FLEX_BISON_LOG_PATH, "w");
-
+    time_t t;
+    srand((unsigned) time(&t));
     // Comment the line below to type inputs directly into the console.
     // Otherwise, they will be read from the file specified in the first program argument.
-    freopen(argv[1], "r", stdin); input_from_file = 1;
+    // freopen(argv[1], "r", stdin); input_from_file = 1;
 
     while(1) {
         if (!input_from_file)

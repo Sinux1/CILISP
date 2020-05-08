@@ -12,7 +12,7 @@
 
 %token <sval> FUNC SYMBOL TYPE
 %token <dval> INT DOUBLE
-%token LPAREN RPAREN EOL QUIT EOFT LET
+%token LPAREN RPAREN EOL QUIT EOFT LET COND
 
 %type <stNode> let_section let_list let_elem
 %type <astNode> s_expr f_expr number s_expr_list
@@ -32,6 +32,8 @@ program:
         ylog(program, s_expr EOFT);
         if ($1) {
             printRetVal(eval($1));
+            freeNode($1);
+            YYACCEPT;
         }
         exit(EXIT_SUCCESS);
     }
@@ -39,9 +41,10 @@ program:
         exit(EXIT_SUCCESS);
     }
     |
-    EOL {
-	YYACCEPT;
-    };
+     EOL {
+     YYACCEPT;
+     }
+    ;
 
 s_expr:
     f_expr {
@@ -62,6 +65,11 @@ s_expr:
     LPAREN let_section s_expr RPAREN {
     ylog(s_expr,LPAR let_section s_expr RPAR );
     $$ = assignSymbolTable($2, $3);
+    }
+    |
+    LPAREN COND s_expr s_expr s_expr RPAREN {
+    ylog(s_expr,LPAR COND s_expr s_expr s_expr RPAR );
+    $$ = decideConditional($3, $4, $5); // eval a, if != 0 then b, else c
     }
     | QUIT {
         ylog(s_expr, QUIT);

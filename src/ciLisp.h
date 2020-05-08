@@ -12,11 +12,14 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include <time.h>
+#include <ctype.h>
 
 #include "ciLispParser.h"
 
 #define DEFAULT_RET_VAL (RET_VAL){INT_TYPE, NAN}
-
+#define bufferSize 20
+#define bufferSizestr "20"
 
 FILE *flex_bison_log_file;
 
@@ -135,42 +138,64 @@ SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *newNode, SYMBOL_TABLE_NODE
 
 AST_NODE *addOperandToList(AST_NODE *newHead, AST_NODE *list);
 
+AST_NODE *decideConditional(AST_NODE *condition, AST_NODE *sExpr1, AST_NODE *sExpr2);
+
 RET_VAL eval(AST_NODE *node);
 
 void printRetVal(RET_VAL val);
 
 void freeNode(AST_NODE *node);
 
-RET_VAL neg_op(AST_NODE *);
+RET_VAL neg_op(AST_NODE *oplist);
 
-RET_VAL abs_op(AST_NODE *);
+RET_VAL abs_op(AST_NODE *oplist);
 
-RET_VAL add_op(AST_NODE *);
+RET_VAL add_op(AST_NODE *oplist);
 
-RET_VAL sub_op(AST_NODE *);
+RET_VAL sub_op(AST_NODE *oplist);
 
-RET_VAL mult_op(AST_NODE *);
+RET_VAL mult_op(AST_NODE *oplist);
 
-RET_VAL div_op(AST_NODE *);
+RET_VAL div_op(AST_NODE *oplist);
 
-RET_VAL remaind_op(AST_NODE *);
+RET_VAL remaind_op(AST_NODE *oplist);
 
-RET_VAL exp_op(AST_NODE *);
+RET_VAL exp_op(AST_NODE *oplist);
 
-RET_VAL exp2_op(AST_NODE *);
+RET_VAL exp2_op(AST_NODE *oplist);
 
-RET_VAL pow_op(AST_NODE *);
+RET_VAL pow_op(AST_NODE *oplist);
 
-RET_VAL log_op(AST_NODE *);
+RET_VAL log_op(AST_NODE *oplist);
 
-RET_VAL sqrt_op(AST_NODE *);
+RET_VAL sqrt_op(AST_NODE *oplist);
 
-RET_VAL cbrt_op(AST_NODE *);
+RET_VAL cbrt_op(AST_NODE *oplist);
 
-RET_VAL hypot_op(AST_NODE *);
+RET_VAL hypot_op(AST_NODE *oplist);
 
-RET_VAL max_op(AST_NODE *);
+RET_VAL max_op(AST_NODE *oplist);
 
-RET_VAL min_op(AST_NODE *);
+RET_VAL min_op(AST_NODE *oplist);
+
+RET_VAL rand_op();
+
+RET_VAL equal_op(AST_NODE *oplist);
+
+RET_VAL greater_op(AST_NODE *oplist);
+
+RET_VAL less_op(AST_NODE *oplist);
+
+RET_VAL print_op(AST_NODE *oplist);
+
+RET_VAL read_op();
+
+void freeSymbolTableRecursive(SYMBOL_TABLE_NODE * tnode);
+
+
+
+// Validates input token, returning type and value for valid token, otherwise nan
+RET_VAL validateToken(char *token);
+
 
 #endif

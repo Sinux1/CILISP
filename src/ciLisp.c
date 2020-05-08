@@ -5,6 +5,7 @@
 */
 #include "ciLisp.h"
 
+
 void yyerror(char *s) {
     fprintf(stdout, "\nERROR: %s\n", s);
     exit(1);
@@ -65,11 +66,14 @@ OPER_TYPE resolveFunc(char *funcName) {
 AST_NODE *createNumberNode(double value, NUM_TYPE type) {
     AST_NODE *node;
     size_t nodeSize;
-
     // allocate space for the fixed sie and the variable part (union)
     nodeSize = sizeof(AST_NODE);
-    if ((node = calloc(nodeSize, 1)) == NULL)
+    node = (AST_NODE *)calloc(1, nodeSize);
+    if ((node) == NULL)
+    {
         yyerror("Memory allocation failed!");
+
+    }
 
     // TODO set the AST_NODE's type, assign values to contained NUM_AST_NODE
     node->type = NUM_NODE_TYPE;
@@ -228,6 +232,24 @@ RET_VAL evalFuncNode(AST_NODE *node) {
         case MIN_OPER:
             result = min_op(node->data.function.opList);
             break;
+        case PRINT_OPER:
+            result = print_op(node->data.function.opList);
+            break;
+        case READ_OPER:
+            result = read_op(node->data.function.opList);
+            break;
+        case RAND_OPER:
+            result = rand_op();
+            break;
+        case EQUAL_OPER:
+            result = equal_op(node->data.function.opList);
+            break;
+        case GREATER_OPER:
+            result = greater_op(node->data.function.opList);
+            break;
+        case LESS_OPER:
+            result = less_op(node->data.function.opList);
+            break;
         default:
             puts("This error is in evalFuncNode()");
     }
@@ -235,6 +257,12 @@ RET_VAL evalFuncNode(AST_NODE *node) {
     return result;
 }
 
+// Evaluate an AST_NODE of Symbol type.
+// Called by eval function. To evaluate, the symbol nodes symbol table is iterated over
+// for a sybol table node with an id that matches. If found, the AST_NODE pointed to by
+// the table nodes value pointer is evaluated. If table is NULL, or a match is not found,
+// symbol table of the parent node is searched for a match. This is repeated for each parent
+// until a match is found or parent node is NULL.
 RET_VAL evalSymbolNode(AST_NODE *node) {
     // Symbol we are looking for
     char *sid = node->data.symbol.id;
@@ -257,20 +285,23 @@ RET_VAL evalSymbolNode(AST_NODE *node) {
             if (!(strcmp(record->id, sid))) {
                 // call to eval will resolve the value node
                 result = eval(record->value);
-                if(record->type != NO_TYPE)
-                {
-                    if(record->type == INT_TYPE && result.type == DOUBLE_TYPE)
-                    {
+                // If symbol type has been cast, set type accordingly
+                if (record->type != NO_TYPE) {
+                    if (record->type == INT_TYPE && result.type == DOUBLE_TYPE) {
+                        // Precision loss warning
                         printf("WARNING: precision loss on int cast from %g to %d for variable %s.\n",
-                                result.value, (int)result.value, sid);
+                               result.value, (int) result.value, sid);
                     }
+                    // set appropriate type
                     result.type = record->type;
                 }
                 return result;
             }
+            // Check next record
             record = record->next;
-
         }
+        // No match in current table or current symbol table is NULL,
+        // move up to parent node and try again
         parent = parent->parent;
     } while (parent != NULL);
     // If the next line executes it is because the symbol was not found in the table
@@ -317,10 +348,10 @@ void printRetVal(RET_VAL val) {
         // To match example output for task, where there were no -nan values, I
         // kept getting -nan when op1 was < 0 and op2 is finite non integer,
         // so I explicitly passed NAN to printf.
-        printf("INTEGER: %lf\n", NAN);
+        printf("INTEGER : %lf\n", NAN);
     } else if (val.type == INT_TYPE) {
         // Casting to type int from double
-        printf("INTEGER: %d\n", (int) val.value);
+        printf("INTEGER : %d\n", (int) val.value);
     } else if (val.type == DOUBLE_TYPE) {
         printf("DOUBLE: %lf\n", val.value);
     }
@@ -343,16 +374,28 @@ void freeNode(AST_NODE *node) {
         freeNode(node->next);
     }
 
+    if(node->symbolTable != NULL)
+    {
+        freeSymbolTableRecursive(node->symbolTable);
+    }
+
     // TODO:
     // if the node is a function node:
     if (node->type == FUNC_NODE_TYPE) {
-        // make a recursive call to free its opList
-        freeNode(node->data.function.opList);
-    }
+        // make a recursive call to free its opList if not NULL
+        if(node->data.function.opList != NULL){
+            freeNode(node->data.function.opList);
+        }
 
+    }
+    if(node->type ==SYM_NODE_TYPE)
+    {
+        free(node->data.symbol.id);
+    }
     free(node);
 }
 
+// Negates the value of the first operand
 RET_VAL neg_op(AST_NODE *oplist) {
     RET_VAL result;
     if (oplist == NULL) {
@@ -716,13 +759,23 @@ RET_VAL min_op(AST_NODE *oplist) {
     return result;
 }
 
+RET_VAL rand_op() {
+    RET_VAL result;
+    result.type = DOUBLE_TYPE;
+    // This mapping allows for RAND_MAX + 1 possible return values
+    // between 0 and 1 inclusive
+    result.value = rand() / ((double) RAND_MAX);
+    return result;
+}
+
 // Create Symbol Node- Receives a string from tokenizer
 // Sets node type and symbol id
 AST_NODE *createSymbolNode(char *id) {
     AST_NODE *node;
     size_t nodeSize;
     nodeSize = sizeof(AST_NODE);
-    if ((node = calloc(nodeSize, 1)) == NULL) {
+    node = (AST_NODE *)calloc(nodeSize, 1);
+    if ((node) == NULL) {
         yyerror("Memory allocation failed!");
     }
     node->type = SYM_NODE_TYPE;
@@ -760,30 +813,213 @@ SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *list, SYMBOL_TABLE_NODE *n
 SYMBOL_TABLE_NODE *createSymbolTableNode(char *type, char *id, AST_NODE *node) {
     SYMBOL_TABLE_NODE *tnode;
     size_t nodeSize;
+    AST_NODE *numberNode = (AST_NODE *) calloc(1, sizeof(AST_NODE));
+    numberNode->type = NUM_NODE_TYPE;
+    numberNode->data.number = eval(node);
+    freeNode(node);
     nodeSize = sizeof(SYMBOL_TABLE_NODE);
     if ((tnode = calloc(nodeSize, 1)) == NULL)
         yyerror("Memory allocation failed!");
 
-    if(type == NULL)
-    {
+    if (type == NULL) {
         tnode->type = NO_TYPE;
+    } else {
+        tnode->type = (strcmp(type, typeNames[INT_TYPE]) == 0) ? INT_TYPE : DOUBLE_TYPE;
     }
-    else{
-        tnode->type = (strcmp(type, typeNames[INT_TYPE]) == 0)? INT_TYPE: DOUBLE_TYPE;
-    }
-
 
     tnode->id = id;
-    tnode->value = node;
-
-    // Using ternary, strcmp evaluates to 0 if strings are same.
-    // So negating the 0 will evaluate to positive if type is int,
-    // and will assign INT_TYPE to tnode-> type, otherwise a nested ternary
-    // will check if it is a double, assigning double type, otherwise no type.
-
+    tnode->value = numberNode;
 
     return tnode;
 }
+
+AST_NODE *decideConditional(AST_NODE *condition, AST_NODE *sExpr1, AST_NODE *sExpr2) {
+
+    if(eval(condition).value){
+        freeNode(condition);
+        freeNode(sExpr2);
+        return sExpr1;
+    }
+    else{
+        freeNode(condition);
+        freeNode(sExpr1);
+        return sExpr2;
+    }
+}
+
+// Recieves two operands and compares them. If they are quantitatively equal,
+// returns integer 1. Otherwise, 0
+RET_VAL equal_op(AST_NODE *oplist) {
+    RET_VAL result;
+    result.type = INT_TYPE;
+    // Make sure there are at least two operands
+    if (oplist == NULL || oplist->next == NULL) {
+        puts("Error: equal is a binary function and requires two operands\nReturning false");
+        result.value = 0;
+        return result;
+    }else if(oplist->next->next != NULL)
+    {
+        puts("WARNING: equal called with extra (ignored) operands!.");
+    }
+    // Using ternary operator to check if operands are equal, returning 1 if they are, 0 otherwise.
+    result.value = (eval(oplist).value == eval(oplist->next).value) ? 1 : 0;
+    return result;
+}
+
+RET_VAL greater_op(AST_NODE *oplist) {
+    RET_VAL result;
+    result.type = INT_TYPE;
+    // Make sure there are at least two operands
+    if (oplist == NULL || oplist->next == NULL) {
+        puts("Error: greater is a binary function and requires two operands\nReturning false");
+        result.value = 0;
+        return result;
+    }else if(oplist->next->next != NULL)
+    {
+        puts("WARNING: greater called with extra (ignored) operands!.");
+    }
+    // Using ternary operator to check if operands are equal, returning 1 if they are, 0 otherwise.
+    result.value = (eval(oplist).value > eval(oplist->next).value) ? 1 : 0;
+    return result;
+}
+
+RET_VAL less_op(AST_NODE *oplist) {
+    RET_VAL result;
+    result.type = INT_TYPE;
+    // Make sure there are at least two operands
+    if (oplist == NULL || oplist->next == NULL) {
+        puts("Error: equal is a binary function and requires two operands\nReturning false");
+        result.value = 0;
+        return result;
+    }else if(oplist->next->next != NULL)
+    {
+        puts("WARNING: equal called with extra (ignored) operands!.");
+    }
+    // Using ternary operator to check if operands are equal, returning 1 if they are, 0 otherwise.
+    result.value = (eval(oplist).value < eval(oplist->next).value) ? 1 : 0;
+    return result;
+}
+
+RET_VAL print_op(AST_NODE *oplist)
+{
+    RET_VAL result;
+    AST_NODE *operand = oplist;
+
+    if (operand == NULL) {
+        puts("ERROR: print called with no operands!");
+        return DEFAULT_RET_VAL;
+    }
+    // If there are at least two operands, iterate through them,
+    // evaluating and printing the result until the last operand is
+    // reached
+    while(operand->next != NULL){
+        result = eval(operand);
+        if(result.type == INT_TYPE)
+        {
+            printf("INTEGER : %d\n", (int)result.value);
+        } else{
+            printf("DOUBLE : %lf\n", result.value);
+        }
+        operand = operand->next;
+    }
+    // Print last operand type and value to stdout
+    result = eval(operand);
+    if(result.type == INT_TYPE)
+    {
+        printf("INTEGER : %d\n", (int)result.value);
+    } else{
+        printf("DOUBLE : %lf\n", result.value);
+    }
+    return result;
+}
+
+RET_VAL read_op()
+{
+    RET_VAL result = DEFAULT_RET_VAL;
+    char *input =  (char*)malloc(bufferSize* sizeof(char));
+
+    do{
+        printf("read :: ");
+        scanf("%s", input); getchar();
+        if(input != NULL){
+            result = validateToken(input);
+        }
+        if(isnan(result.value))
+            printf("Please enter a valid int or double\n");
+    }while(isnan(result.value));
+    free(input);
+    return result;
+}
+
+// If token is an int or double, return value and type, otherwise return nan
+RET_VAL validateToken(char *token)
+{
+    if(token == NULL)
+    {
+        return DEFAULT_RET_VAL;
+    }
+    RET_VAL result;
+    int index = 0;
+    bool isDouble = false;
+    int nNegSigns = 0;
+    int nSigns = 0;
+    bool prefix = true;
+
+    while(prefix)
+    {
+        if(token[index] == '-')
+        {
+            nNegSigns++; nSigns++; index++;
+        }else if(token[index] == '+')
+        {
+            nSigns++; index++;
+            continue;
+        } else{
+            prefix = false;
+        }
+    }
+
+    char *bString = (char *) malloc((bufferSize - nSigns) * sizeof(char) + 1 );
+
+
+    while(index < strlen(token))
+    {
+        // Iterating over token, ensuring all characters are digits
+        // and if they are not, they can only be a '.' char, and only if one has
+        // not already appeared - d+\.d+
+        if(isdigit(token[index]))
+        {
+            bString[index - nSigns] = token[index];
+            index++;
+            continue;
+        }else if(token[index] == '.' && !isDouble)
+        {
+            bString[index - nSigns] = token[index];
+            index++;
+            isDouble = true;
+            continue;
+        } else{
+            return DEFAULT_RET_VAL;
+        }
+    }
+    // If while loop breaks with isDouble true, then it is a double, otherwise an int
+    result.type = (isDouble) ? DOUBLE_TYPE: INT_TYPE;
+    // strtod converts string to double rep
+    result.value = (nNegSigns % 2 == 1)? -strtod(bString, NULL):strtod(bString, NULL);
+    free(bString);
+    return result;
+}
+
+void freeSymbolTableRecursive(SYMBOL_TABLE_NODE *tnode) {
+    if(tnode->next != NULL)
+    {
+        freeSymbolTableRecursive(tnode->next);
+    }
+    freeNode(tnode->value);
+    free(tnode->id);
+    free(tnode);
+}
+
 
 // debug function
 void showme(SYMBOL_TABLE_NODE *stnode) {

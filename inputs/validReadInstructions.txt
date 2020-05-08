@@ -1,0 +1,4 @@
+( ( let (x (read)) ) (print x) )
+( ( let (x (read)) (y (read)) ) (print x x y y) )
+(add ((let (double x 1) (y (cond 1 (print 1 2 3 (rand)) (print (rand)) ) ) ) y ) (read))
+
