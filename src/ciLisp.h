@@ -190,8 +190,7 @@ RET_VAL print_op(AST_NODE *oplist);
 
 RET_VAL read_op();
 
-void freeSymbolTableRecursive(SYMBOL_TABLE_NODE * tnode);
-
+void freeSymbolTableRecursive(SYMBOL_TABLE_NODE *tnode);
 
 
 // Validates input token, returning type and value for valid token, otherwise nan

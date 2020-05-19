@@ -99,7 +99,7 @@ s_expr_list:
     }
 
     |{
-    	ylog(s_expr, NULL);
+    	ylog(s_expr_list, NULL);
     	$$ = NULL;
     };
 

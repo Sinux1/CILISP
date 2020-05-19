@@ -1,5 +1,10 @@
 # CiLisp
 ## Summary  
+This is an interpreter for a lisp-like language. Functionality was added a task at a time. Basic features include "neg", 
+"abs", "add", "sub", "mult", "div", "remainder", "exp","exp2","pow",  "log", "sqrt", "cbrt", "hypot", "max", "min", 
+"print", "read", "rand", "equal", "less" and "greater", the ability to use symbols (variables), cast symbols to int or 
+double type, and conditional statements.  All test runs and output are included for each task in Sample Runs. Sample runs 
+and output are as current as the most recent task completion. 
 #### Task 1 ::= CPN Calculator 
 This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for 
 the grammar of a lisp like language for evaluating expressions in CNP form, that is as an n-tuple, first element is an 
@@ -75,9 +80,9 @@ table node is evaluated and returned.
 ---
 #### Task 4
 - I tested the precision of the equal operation by comparing 0 to 0.000...1 with increasing number of decimal digits 
-until the comparison returned true, and found that this implementation, on my development PC, will return true when the 
-number of zeroes that follow the decimal, preceding the last 1, is 322. That is, 322 zeroes and a 1 after the decimal is 
-considered 0 and when compared to 0 will evaluate to true.
+until the comparison returned true, and found that this implementation, on my development PC, will return true once the 
+number of zeroes that follow the decimal, preceding the last 1, is 322. That is, at least 322 zeroes and a 1 after the decimal is 
+considered 0 and when compared to 0 with `equal` operator will evaluate to true.
 - Any instruction containing a read function is always executed from stdin, and is never redirected from a file.  
 ---
 
@@ -260,96 +265,96 @@ specific warning.
 ```
 ### Run 1 : output
 ```
-INTEGER: -5
+INTEGER : -5
 DOUBLE: -5.500000
 DOUBLE: 5.000000
-INTEGER: 5
+INTEGER : 5
 ERROR: neg called with no operands!
-INTEGER: nan
+INTEGER : nan
 WARNING: neg called with extra (ignored) operands!
-INTEGER: -1
-INTEGER: 1
+INTEGER : -1
+INTEGER : 1
 DOUBLE: 1.200000
-INTEGER: 3
-INTEGER: 0
+INTEGER : 3
+INTEGER : 0
 DOUBLE: 0.000000
 DOUBLE: 1.400000
 ERROR: abs called with no args.
-INTEGER: nan
+INTEGER : nan
 WARNING: abs call with extra operands. Only first operand used!
-INTEGER: 1
+INTEGER : 1
 WARNING: add call with no operands, 0 returned!
-INTEGER: 0
-INTEGER: 1
+INTEGER : 0
+INTEGER : 1
 DOUBLE: 1.000000
-INTEGER: 15
-INTEGER: -3
+INTEGER : 15
+INTEGER : -3
 DOUBLE: -3.000000
 DOUBLE: 0.000000
 ERROR: sub called with no operands!
-INTEGER: nan
+INTEGER : nan
 ERROR: sub called with only one arg!
-INTEGER: nan
+INTEGER : nan
 ERROR: sub called with only one arg!
-INTEGER: nan
-INTEGER: -1
-INTEGER: 1
-INTEGER: 3
+INTEGER : nan
+INTEGER : -1
+INTEGER : 1
+INTEGER : 3
 DOUBLE: 1.000000
 DOUBLE: 3.000000
 DOUBLE: 0.000000
 DOUBLE: 1.000000
 WARNING: sub called with extra (ignored) operands!
-INTEGER: -1
+INTEGER : -1
 WARNING: mult call with no operands, 1 returned!
-INTEGER: 1
-INTEGER: 1
+INTEGER : 1
+INTEGER : 1
 DOUBLE: 1.000000
-INTEGER: -1
+INTEGER : -1
 DOUBLE: 1.000000
-INTEGER: 120
+INTEGER : 120
 DOUBLE: -120.000000
 ERROR: div called with no operands!
-INTEGER: nan
+INTEGER : nan
 ERROR: div called with only one arg!
-INTEGER: nan
+INTEGER : nan
 ERROR: div called with only one arg!
-INTEGER: nan
-INTEGER: 0
+INTEGER : nan
+INTEGER : 0
 DOUBLE: 0.500000
-INTEGER: 2
+INTEGER : 2
 DOUBLE: 2.000000
 DOUBLE: 2.500000
 DOUBLE: -5.000000
 WARNING: div called with extra (ignored) operands!
-INTEGER: 0
+INTEGER : 0
 WARNING: div called with extra (ignored) operands!
-INTEGER: 0
+INTEGER : 0
 WARNING: div called with extra (ignored) operands!
 DOUBLE: 2.500000
 Division by zero error
-INTEGER: nan
+INTEGER : nan
 ERROR: remainder called with no operands!
-INTEGER: nan
+INTEGER : nan
 ERROR: remainder called with only one arg!
-INTEGER: nan
+INTEGER : nan
 ERROR: remainder called with only one arg!
-INTEGER: nan
+INTEGER : nan
 ERROR: remainder called with only one arg!
-INTEGER: nan
-INTEGER: 1
-INTEGER: 0
+INTEGER : nan
+INTEGER : 1
+INTEGER : 0
 DOUBLE: 0.500000
-INTEGER: 2
-INTEGER: 4
+INTEGER : 2
+INTEGER : 4
 DOUBLE: 4.000000
 DOUBLE: 4.000000
 WARNING: remainder called with extra (ignored) operands!
-INTEGER: 1
+INTEGER : 1
 WARNING: remainder called with extra (ignored) operands!
-INTEGER: 2
+INTEGER : 2
 ERROR: exp called with no operands!
-INTEGER: nan
+INTEGER : nan
 DOUBLE: 2.718282
 DOUBLE: 1.000000
 DOUBLE: 0.367879
@@ -358,63 +363,63 @@ DOUBLE: 0.135335
 WARNING: exp called with extra (ignored) operands!
 DOUBLE: 2.718282
 ERROR: exp2 called with no operands!
-INTEGER: nan
-INTEGER: 2
+INTEGER : nan
+INTEGER : 2
 DOUBLE: 2.000000
-INTEGER: 1
+INTEGER : 1
 DOUBLE: 1.000000
 DOUBLE: 1.414214
 DOUBLE: 1.414214
 DOUBLE: 0.250000
 DOUBLE: 0.250000
 WARNING: exp2 called with extra (ignored) operands!
-INTEGER: 2
+INTEGER : 2
 ERROR: pow called with no operands!
-INTEGER: nan
+INTEGER : nan
 ERROR: pow called with only one arg!
-INTEGER: nan
+INTEGER : nan
 ERROR: pow called with only one arg!
-INTEGER: nan
-INTEGER: 1
+INTEGER : nan
+INTEGER : 1
 DOUBLE: 1.000000
-INTEGER: 2
+INTEGER : 2
 DOUBLE: 2.100000
-INTEGER: nan
-INTEGER: 1
+INTEGER : nan
+INTEGER : 1
 DOUBLE: 1.000000
 DOUBLE: 1.000000
-INTEGER: 27
+INTEGER : 27
 DOUBLE: 27.000000
 DOUBLE: 3.000000
 WARNING: pow called with extra (ignored) operands!
-INTEGER: 1
+INTEGER : 1
 ERROR: log called with no operands!
-INTEGER: nan
+INTEGER : nan
 DOUBLE: 0.000000
 DOUBLE: -inf
-INTEGER: nan
+INTEGER : nan
 DOUBLE: -inf
-INTEGER: nan
+INTEGER : nan
 DOUBLE: 1.000000
 DOUBLE: 3.000000
 DOUBLE: 3.000000
 WARNING: log called with extra (ignored) operands!
 DOUBLE: 0.000000
 ERROR: sqrt called with no operands!
-INTEGER: nan
+INTEGER : nan
 DOUBLE: 1.000000
 DOUBLE: 1.000000
 DOUBLE: 0.000000
 DOUBLE: 0.000000
-INTEGER: nan
-INTEGER: nan
+INTEGER : nan
+INTEGER : nan
 DOUBLE: 2.000000
 DOUBLE: 2.000000
 DOUBLE: 1.414214
 WARNING: sqrt called with extra (ignored) operands!
 DOUBLE: 1.000000
 ERROR: cbrt called with no operands!
-INTEGER: nan
+INTEGER : nan
 DOUBLE: 0.000000
 DOUBLE: 0.000000
 DOUBLE: -1.000000
@@ -442,31 +447,31 @@ DOUBLE: 8.660254
 DOUBLE: 8.660254
 DOUBLE: 13.000000
 ERROR: max called with no operands!
-INTEGER: nan
-INTEGER: 1
-INTEGER: -1
+INTEGER : nan
+INTEGER : 1
+INTEGER : -1
 DOUBLE: 1.000000
 DOUBLE: 232311.121000
-INTEGER: 9
+INTEGER : 9
 DOUBLE: 25.000000
 ERROR: min called with no operands!
-INTEGER: nan
-INTEGER: 1
+INTEGER : nan
+INTEGER : 1
 DOUBLE: 0.000000
-INTEGER: 0
-INTEGER: -5
+INTEGER : 0
+INTEGER : -5
 DOUBLE: -12.000000
 DOUBLE: 1.000000
-INTEGER: 14
+INTEGER : 14
 DOUBLE: -14.000000
 DOUBLE: 22.990681
 DOUBLE: 10.000000
-INTEGER: 28
+INTEGER : 28
 DOUBLE: 28.000000
 ERROR: sub called with no operands!
-INTEGER: nan
+INTEGER : nan
 WARNING: sub called with extra (ignored) operands!
-INTEGER: 1
+INTEGER : 1
 
 Process finished with exit code 0
 ```
@@ -492,7 +497,6 @@ Process finished with exit code 1
 
 ```
 ---  
-
 ## Task 2
 ### Run 1: valid input
 Input in `/inputs/input2.txt` was collected from Task 1 example sample runs and includes other expressions to test various 
@@ -514,24 +518,29 @@ parenthesized s_expr with a `NULL` let_section.
 ((let (x 1)     (x 3)  (y 10) (x 5)) (add x ((let (x 10)) (add x (neg y)))))
 QUIT
 quit
+
+(add ((let (x 1)) x) ((let (y 10)) x))
+
+
 ```
 ### Run 1: output
 ```
-INTEGER: 1
-INTEGER: 6
+INTEGER : 1
+INTEGER : 6
 DOUBLE: 4.242641
 DOUBLE: 5.398346
 DOUBLE: 17.414214
-INTEGER: 4
-INTEGER: 130
+INTEGER : 4
+INTEGER : 130
 Undefined Symbol!
-INTEGER: nan
+INTEGER : nan
 Undefined Symbol!
-INTEGER: nan
-INTEGER: 1
-INTEGER: 5
+INTEGER : nan
+INTEGER : 1
+INTEGER : 5
+INTEGER : 5
 Undefined Symbol!
-INTEGER: nan
+INTEGER : nan
 
 Process finished with exit code 0
 ```
@@ -583,9 +592,8 @@ quit
 ```
 ### Run 1: output  
 ```
-
 WARNING: precision loss on int cast from 1.25 to 1 for variable a.
-INTEGER: 2
+INTEGER : 2
 ERROR: invalid character: >>.<<
 DOUBLE: 30.000000
 DOUBLE: 5.250000
@@ -599,18 +607,16 @@ DOUBLE: 17.414214
 DOUBLE: 4.000000
 DOUBLE: 130.000000
 Undefined Symbol!
-INTEGER: nan
+INTEGER : nan
 Undefined Symbol!
-INTEGER: nan
-INTEGER: 1
+INTEGER : nan
+INTEGER : 1
 DOUBLE: 5.000000
-INTEGER: 5
+INTEGER : 5
 Undefined Symbol!
-INTEGER: nan
+INTEGER : nan
 Undefined Symbol!
-INTEGER: nan
-
-Process finished with exit code 0
+INTEGER : nan
 
 ``` 
 ## Task 4
@@ -634,9 +640,11 @@ print function, since the condition is false.
 (add ((let (x 1) (y (cond 1 (print 1 2 3 (rand)) (print (rand)) ) ) ) y ) 1)
 (print 1)
 (equal 0 0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001)
+(add 1 (print 2) )
 
 (add 1 (print 2) (cond 0 (print (rand) (rand) (rand) (rand) (rand)) 3 ) )
 (add 1 (print 2 3 4 (rand)) )
+(add 1 (print 2 3 4 ) )
 
 ( ( let (x (rand)) ) (add (print x) (print x) ) )
 (equal 0 0)
@@ -649,36 +657,43 @@ print function, since the condition is false.
 (greater (print 1 2 3 0) 0)
 (greater 0 0.0)
 ( ( let (x 0) (y 1) ) (less x y) )
+(cond (cond( cond (rand) (print 1) (print 2)) (print 11) (print 22)) (print 111) (print 222))
 ```
 ### Run 1 : output
 ```
-DOUBLE: 0.102750
-DOUBLE: 0.513107
-DOUBLE: 0.572894
-DOUBLE: 0.646519
-DOUBLE: 0.791061
-DOUBLE: 0.479726
-DOUBLE: 0.174375
-DOUBLE: 0.142548
-DOUBLE: 0.303393
+DOUBLE: 0.893068
+DOUBLE: 0.127146
+DOUBLE: 0.251686
+DOUBLE: 0.649299
+DOUBLE: 0.373309
+DOUBLE: 0.104816
+DOUBLE: 0.985408
+DOUBLE: 0.895297
+DOUBLE: 0.324124
 INTEGER : 1
 INTEGER : 2
 INTEGER : 3
-DOUBLE : 0.541883
-DOUBLE: 1.541883
+DOUBLE : 0.926400
+DOUBLE: 1.926400
 INTEGER : 1
 INTEGER : 1
 INTEGER : 0
+INTEGER : 2
+INTEGER : 3
 INTEGER : 2
 INTEGER : 6
 INTEGER : 2
 INTEGER : 3
 INTEGER : 4
-DOUBLE : 0.975509
-DOUBLE: 1.975509
-DOUBLE : 0.889982
-DOUBLE : 0.889982
-DOUBLE: 1.779964
+DOUBLE : 0.468500
+DOUBLE: 1.468500
+INTEGER : 2
+INTEGER : 3
+INTEGER : 4
+INTEGER : 5
+DOUBLE : 0.065205
+DOUBLE : 0.065205
+DOUBLE: 0.130409
 INTEGER : 1
 INTEGER : 0
 DOUBLE : 2.000000
@@ -696,6 +711,11 @@ INTEGER : 0
 INTEGER : 0
 INTEGER : 0
 INTEGER : 1
+(cond (cond( cond (rand) (print 1) (print 2)) (print 11) (print 22)) (print 111) (print 222))
+INTEGER : 1
+INTEGER : 11
+INTEGER : 111
+INTEGER : 111
 
 Process finished with exit code 0
 
@@ -736,26 +756,20 @@ quit
 Process finished with exit code 0
 
 ```
+### Run 4: invalid inputs     
+All invalid inputs from Tasks 1 - 3 were run again, and are shown above. I could not think of any unique invalid 
+instructions that I hadn't already tried.
 
 
-### Run 3: invalid inputs
-```
+---
+## Task 5
+###Run 1 : valid input  
 
-```
-### Run 3 : output  
-Every bad input threw the following error correctly.
-``` 
-ERROR: syntax error
+###Run 1 : output
 
-Process finished with exit code 1
-
-```
 --- 
 
 # Known Bugs 
-- Valgrind complains of UninitConditions and UninitValues when running read instructions from command line, but the 
-location is deep inside files I did not edit. I made every attempt at tracking the cause, but to no avail.  
-![](./figures/valgrindtask4.png) 
 - Instructions from file (when stdin is redirected with freopen) are not echoed to console. 
 - The read function can only be called from stdin without redirection with freopen. Any attempt to use read from input 
 file will result in undefined behavior.
