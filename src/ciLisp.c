@@ -429,29 +429,38 @@ RET_VAL abs_op(AST_NODE *oplist) {
     return result;
 }
 
+// add_op is a wrapper for a tail recursive add function
 RET_VAL add_op(AST_NODE *oplist) {
-    RET_VAL result;
-    RET_VAL op1;
     if (oplist == NULL) {
         puts("WARNING: add call with no operands, 0 returned!");
-        result.type = INT_TYPE;
-        result.value = 0;
-        return result;
+        return DEFAULT_ADD_OP_NOARGS;
     }
-    AST_NODE *nextop = oplist;
-    op1 = eval(nextop);
-    double sum = op1.value;
-    result.type = op1.type;
-    while (nextop->next != NULL) {
-        nextop = nextop->next;
-        op1 = eval(nextop);
-        if (op1.type == DOUBLE_TYPE) {
-            result.type = DOUBLE_TYPE;
-        }
-        sum += op1.value;
+    RET_VAL temp = eval(oplist);
+    // Return value from tail recursive function
+    return addTailRecursion(temp.value, temp.type, oplist->next);
+
+}
+
+//Tail recursive add function
+RET_VAL addTailRecursion(double subtotal, NUM_TYPE subtype, AST_NODE *oplist) {
+    // Checking for base case
+    if (oplist == NULL) {
+        // Subtotal and type are both calculated and passed in,
+        // so upon finding the base case, my values have already
+        // been calculated and may return
+        return (RET_VAL) {subtype, subtotal};
     }
-    result.value = sum;
-    return result;
+    // Evaluate current operand
+    RET_VAL temp = eval(oplist);
+    // By carrying in the type of previous value (or INT on first call)
+    // I am able to compare previous op type to current op type, and if either is double,
+    // double is passed to next call
+    subtype = (subtype || temp.type) ? DOUBLE_TYPE : INT_TYPE;
+    // Subtotal calculated from previous calls subtotal and current operands value.
+    subtotal += temp.value;
+    // Tail recursive, no calculations done subsequent to function call
+    return addTailRecursion(subtotal, subtype, oplist->next);
+
 
 }
 
@@ -484,29 +493,38 @@ RET_VAL sub_op(AST_NODE *oplist) {
     return result;
 }
 
+// add_op is a wrapper for a tail recursive add function
 RET_VAL mult_op(AST_NODE *oplist) {
-    RET_VAL result;
-    RET_VAL op1;
     if (oplist == NULL) {
         puts("WARNING: mult call with no operands, 1 returned!");
-        result.type = INT_TYPE;
-        result.value = 1;
-        return result;
+        return DEFAULT_MULT_OP_NOARGS;
     }
-    AST_NODE *nextop = oplist;
-    op1 = eval(nextop);
-    double product = op1.value;
-    result.type = op1.type;
-    while (nextop->next != NULL) {
-        nextop = nextop->next;
-        op1 = eval(nextop);
-        if (op1.type == DOUBLE_TYPE) {
-            result.type = DOUBLE_TYPE;
-        }
-        product *= op1.value;
+    RET_VAL temp = eval(oplist);
+    // Return value from tail recursive function
+    return multTailRecursion(temp.value, temp.type, oplist->next);
+}
+
+// Tail recursive mult function
+RET_VAL multTailRecursion(double subtotal, NUM_TYPE subtype, AST_NODE *oplist) {
+    // Checking for base case
+    if (oplist == NULL) {
+        // Subtotal and type are both calculated and passed in,
+        // so upon finding the base case, my values have already
+        // been calculated and may return
+        return (RET_VAL) {subtype, subtotal};
     }
-    result.value = product;
-    return result;
+    // Evaluate current operand
+    RET_VAL temp = eval(oplist);
+    // By carrying in the type of previous value (or INT on first call)
+    // I am able to compare previous op type to current op type, and if either is double,
+    // double is passed to next call
+    subtype = (subtype || temp.type) ? DOUBLE_TYPE : INT_TYPE;
+    // Subtotal calculated from previous calls subtotal and current operands value.
+    subtotal *= temp.value;
+    // Tail recursive, no calculations done subsequent to function call
+    return multTailRecursion(subtotal, subtype, oplist->next);
+
+
 }
 
 RET_VAL div_op(AST_NODE *oplist) {
@@ -680,80 +698,77 @@ RET_VAL cbrt_op(AST_NODE *oplist) {
 }
 
 RET_VAL hypot_op(AST_NODE *oplist) {
-    RET_VAL result;
-    RET_VAL op1;
+
     if (oplist == NULL) {
         puts("ERROR: hypot called with no operands, 0.0 returned!");
-        result.type = DOUBLE_TYPE;
-        result.value = 0;
-        return result;
+        return DEFAULT_HYPOT_OP_NOARGS;
     }
+    RET_VAL temp = eval(oplist);
+    double subtotal = temp.value * temp.value;
+    return hypotTailRecursion(subtotal, oplist->next);
 
-    AST_NODE *nextop = oplist;
-    op1 = eval(nextop);
-    double soq = op1.value * op1.value;
-    while (nextop->next != NULL) {
-        nextop = nextop->next;
-        op1 = eval(nextop);
-        soq += op1.value * op1.value;
+}
+
+RET_VAL hypotTailRecursion(double st, AST_NODE *oplist){
+    if(oplist == NULL)
+    {
+        // Base case, take square root of subtotal and return
+        return (RET_VAL ){DOUBLE_TYPE, sqrt(st)} ;
     }
-    result.type = DOUBLE_TYPE;
-    result.value = sqrt(soq);
-    return result;
+    RET_VAL temp = eval(oplist);
+    st+= (temp.value*temp.value);
+    return hypotTailRecursion(st, oplist->next);
 }
 
 RET_VAL max_op(AST_NODE *oplist) {
-    RET_VAL result;
-    RET_VAL op;
-    double maxVal;
     if (oplist == NULL) {
         puts("ERROR: max called with no operands!");
-        result.type = INT_TYPE;
-        result.value = NAN;
-        return result;
+        return DEFAULT_RET_VAL;
     }
-    AST_NODE *nextop = oplist;
-    op = eval(nextop);
-    result.type = op.type;
-    maxVal = op.value;
-    while (nextop->next != NULL) {
-
-        nextop = nextop->next;
-        op = eval(nextop);
-        if (maxVal < op.value) {
-            maxVal = op.value;
-            result.type = op.type;
-        }
-    }
-    result.value = maxVal;
-    return result;
+    RET_VAL temp = eval(oplist);
+    return maxTailRecursion(temp.value, temp.type, oplist->next);
 }
 
+
+RET_VAL maxTailRecursion(double subtotal, NUM_TYPE subtype, AST_NODE *oplist) {
+    if (oplist == NULL) {
+        return (RET_VAL) {subtype, subtotal};
+    }
+    RET_VAL temp = eval(oplist);
+    // Ternary to establish if passed in subtype or subtype of current operand is larger
+    if(subtotal < temp.value){
+        subtotal = temp.value;
+        subtype = temp.type;
+    }
+
+    return maxTailRecursion(subtotal, subtype, oplist->next);
+
+
+}
+
+
 RET_VAL min_op(AST_NODE *oplist) {
-    RET_VAL result;
-    RET_VAL op;
-    double minVal;
     if (oplist == NULL) {
         puts("ERROR: min called with no operands!");
-        result.type = INT_TYPE;
-        result.value = NAN;
-        return result;
+        return DEFAULT_RET_VAL;
     }
-    AST_NODE *nextop = oplist;
-    op = eval(nextop);
-    result.type = op.type;
-    minVal = op.value;
-    while (nextop->next != NULL) {
+    RET_VAL temp = eval(oplist);
+    return minTailRecursion(temp.value, temp.type, oplist->next);
+}
 
-        nextop = nextop->next;
-        op = eval(nextop);
-        if (minVal > op.value) {
-            minVal = op.value;
-            result.type = op.type;
-        }
+RET_VAL minTailRecursion(double subtotal, NUM_TYPE subtype, AST_NODE *oplist){
+    if (oplist == NULL) {
+        return (RET_VAL) {subtype, subtotal};
     }
-    result.value = minVal;
-    return result;
+    RET_VAL temp = eval(oplist);
+    // Ternary to establish if passed in subtype or subtype of current operand is larger
+    if(subtotal > temp.value){
+        subtotal = temp.value;
+        subtype = temp.type;
+    }
+
+    return minTailRecursion(subtotal, subtype, oplist->next);
+
 }
 
 RET_VAL rand_op() {
@@ -967,7 +982,7 @@ RET_VAL validateToken(char *token) {
         }
     }
 
-    char *bString = (char *) calloc((bufferSize - nSigns) ,  sizeof(char) + 1);
+    char *bString = (char *) calloc((bufferSize - nSigns), sizeof(char) + 1);
 
 
     while (index < strlen(token)) {
@@ -991,7 +1006,7 @@ RET_VAL validateToken(char *token) {
     result.type = (isDouble) ? DOUBLE_TYPE : INT_TYPE;
     // strtod converts string to double rep
     result.value = strtod(bString, NULL);
-    if(nNegSigns % 2 == 1){ result.value = -result.value;}
+    if (nNegSigns % 2 == 1) { result.value = -result.value; }
     free(bString);
     return result;
 }

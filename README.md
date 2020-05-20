@@ -711,7 +711,6 @@ INTEGER : 0
 INTEGER : 0
 INTEGER : 0
 INTEGER : 1
-(cond (cond( cond (rand) (print 1) (print 2)) (print 11) (print 22)) (print 111) (print 222))
 INTEGER : 1
 INTEGER : 11
 INTEGER : 111

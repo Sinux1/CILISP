@@ -1,0 +1,1 @@
+( ( let ( type funcName lambda ( abc ) (neg abc)) ) ) funcName(3) )

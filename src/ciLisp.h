@@ -18,6 +18,11 @@
 #include "ciLispParser.h"
 
 #define DEFAULT_RET_VAL (RET_VAL){INT_TYPE, NAN}
+#define DEFAULT_ADD_OP_NOARGS (RET_VAL){INT_TYPE, 0}
+#define DEFAULT_MULT_OP_NOARGS (RET_VAL){INT_TYPE, 1}
+#define DEFAULT_HYPOT_OP_NOARGS (RET_VAL){DOUBLE_TYPE, 0}
+
+
 #define bufferSize 20
 #define bufferSizestr "20"
 
@@ -189,6 +194,16 @@ RET_VAL less_op(AST_NODE *oplist);
 RET_VAL print_op(AST_NODE *oplist);
 
 RET_VAL read_op();
+
+RET_VAL addTailRecursion(double st, NUM_TYPE sty, AST_NODE *oplist);
+
+RET_VAL multTailRecursion(double st, NUM_TYPE sty, AST_NODE *oplist);
+
+RET_VAL maxTailRecursion(double st, NUM_TYPE sty, AST_NODE *oplist);
+
+RET_VAL minTailRecursion(double st, NUM_TYPE sty, AST_NODE *oplist);
+
+RET_VAL hypotTailRecursion(double st, AST_NODE *oplist);
 
 void freeSymbolTableRecursive(SYMBOL_TABLE_NODE *tnode);
 
