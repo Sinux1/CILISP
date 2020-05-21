@@ -14,7 +14,7 @@
 %token <dval> INT DOUBLE
 %token LPAREN RPAREN EOL QUIT EOFT LET COND LAMBDA
 
-%type <stNode> let_section let_list let_elem
+%type <stNode> let_section let_list let_elem arg_list
 %type <astNode> s_expr f_expr number s_expr_list
 
 %%
@@ -74,7 +74,7 @@ s_expr:
     |
     LPAREN COND s_expr s_expr s_expr RPAREN {
     ylog(s_expr,LPAR COND s_expr s_expr s_expr RPAR );
-    $$ = decideConditional($3, $4, $5); // eval a, if != 0 then b, else c
+    $$ = decideConditional($3, $4, $5);
     }
     | QUIT {
         ylog(s_expr, QUIT);
@@ -111,13 +111,12 @@ s_expr_list:
 arg_list:
 	SYMBOL {
 	ylog(arg_list, SYMBOL);
-	// Need to do stuff
-
+	$$ = createArgTableNode($1);
 	}
 	|
 	SYMBOL arg_list{
 	ylog(arg_list, SYMBOL arg_list);
-	// Need to do stuff
+	$$ = addArgToList($1, $2);
 	}
 
 let_section:
@@ -154,13 +153,12 @@ let_elem:
         |
         LPAREN SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN {
 	ylog(let_elem, LPAREN SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN);
-	//Need to do
-
+	$$ = createLambdaTableNode(NULL, $2, $5, $7);
 	}
 	|
 	LPAREN TYPE SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN {
 	ylog(let_elem, LPAREN TYPE SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN);
-	//Need to do
+	$$ = createLambdaTableNode($2, $3, $6, $8);
 
 	}
 number:

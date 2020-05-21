@@ -249,6 +249,9 @@ RET_VAL evalFuncNode(AST_NODE *node) {
         case LESS_OPER:
             result = less_op(node->data.function.opList);
             break;
+        case CUSTOM_OPER:
+            result = customFunction_op(node);
+            break;
         default:
             puts("This error is in evalFuncNode()");
     }
@@ -709,14 +712,13 @@ RET_VAL hypot_op(AST_NODE *oplist) {
 
 }
 
-RET_VAL hypotTailRecursion(double st, AST_NODE *oplist){
-    if(oplist == NULL)
-    {
+RET_VAL hypotTailRecursion(double st, AST_NODE *oplist) {
+    if (oplist == NULL) {
         // Base case, take square root of subtotal and return
-        return (RET_VAL ){DOUBLE_TYPE, sqrt(st)} ;
+        return (RET_VAL) {DOUBLE_TYPE, sqrt(st)};
     }
     RET_VAL temp = eval(oplist);
-    st+= (temp.value*temp.value);
+    st += (temp.value * temp.value);
     return hypotTailRecursion(st, oplist->next);
 }
 
@@ -736,7 +738,7 @@ RET_VAL maxTailRecursion(double subtotal, NUM_TYPE subtype, AST_NODE *oplist) {
     }
     RET_VAL temp = eval(oplist);
     // Ternary to establish if passed in subtype or subtype of current operand is larger
-    if(subtotal < temp.value){
+    if (subtotal < temp.value) {
         subtotal = temp.value;
         subtype = temp.type;
     }
@@ -756,13 +758,13 @@ RET_VAL min_op(AST_NODE *oplist) {
     return minTailRecursion(temp.value, temp.type, oplist->next);
 }
 
-RET_VAL minTailRecursion(double subtotal, NUM_TYPE subtype, AST_NODE *oplist){
+RET_VAL minTailRecursion(double subtotal, NUM_TYPE subtype, AST_NODE *oplist) {
     if (oplist == NULL) {
         return (RET_VAL) {subtype, subtotal};
     }
     RET_VAL temp = eval(oplist);
     // Ternary to establish if passed in subtype or subtype of current operand is larger
-    if(subtotal > temp.value){
+    if (subtotal > temp.value) {
         subtotal = temp.value;
         subtype = temp.type;
     }
@@ -1024,6 +1026,58 @@ void freeSymbolTableRecursive(SYMBOL_TABLE_NODE *tnode) {
     freeNode(tnode->value);
     free(tnode->id);
     free(tnode);
+}
+// Handler for the evaluation of custom operations
+RET_VAL customFunction_op(AST_NODE *node) {
+    puts("Printing from customFunction_op");
+    RET_VAL result = DEFAULT_RET_VAL;
+    return result;
+}
+
+SYMBOL_TABLE_NODE *createArgTableNode(char *id) {
+    SYMBOL_TABLE_NODE *node;
+    size_t nodeSize;
+    nodeSize = sizeof(SYMBOL_TABLE_NODE);
+    node = (SYMBOL_TABLE_NODE *) calloc(nodeSize, 1);
+    if ((node) == NULL) {
+        yyerror("Memory allocation failed!");
+    }
+    node->symbolType = ARG_TYPE;
+    node->id = id;
+    return node;
+}
+
+SYMBOL_TABLE_NODE *addArgToList(char *id, SYMBOL_TABLE_NODE *list) {
+    SYMBOL_TABLE_NODE *node = createArgTableNode(id);
+    node->next = list;
+    return node;
+
+}
+
+SYMBOL_TABLE_NODE *createLambdaTableNode(char *type, char *id, SYMBOL_TABLE_NODE *args, AST_NODE *node) {
+    // Create the lambaNode
+    SYMBOL_TABLE_NODE *lnode;
+    size_t nodeSize;
+    nodeSize = sizeof(SYMBOL_TABLE_NODE);
+    lnode = (SYMBOL_TABLE_NODE *) calloc(nodeSize, 1);
+
+    if(lnode == NULL)
+        yyerror("Memory allocation failed!");
+    // Set the name of the custom op
+    lnode->id = id;
+    // Set the type of the custom op return value
+    if (type == NULL) {
+        lnode->type = NO_TYPE;
+    } else {
+        lnode->type = (strcmp(type, typeNames[INT_TYPE]) == 0) ? INT_TYPE : DOUBLE_TYPE;
+    }
+    // Set the arg list for the custom op node
+    node->arglist = args;
+    // This is effectively the function definition
+    lnode->value = node;
+
+    return lnode;
+
 }
 
 

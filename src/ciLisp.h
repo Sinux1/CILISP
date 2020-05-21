@@ -111,6 +111,7 @@ typedef struct ast_node {
     AST_NODE_TYPE type;
     struct ast_node *parent;
     struct symbol_table_node *symbolTable;
+    struct symbol_table_node *arglist;
     union {
         NUM_AST_NODE number;
         FUNC_AST_NODE function;
@@ -139,6 +140,8 @@ typedef struct stack_node {
     struct stack_node *next;
 } STACK_NODE;
 
+SYMBOL_TABLE_NODE *createArgTableNode(char *id);
+
 AST_NODE *createNumberNode(double value, NUM_TYPE type);
 
 AST_NODE *createFunctionNode(char *funcName, AST_NODE *opList);
@@ -147,11 +150,15 @@ AST_NODE *createSymbolNode(char *id);
 
 SYMBOL_TABLE_NODE *createSymbolTableNode(char *type, char *id, AST_NODE *node);
 
+SYMBOL_TABLE_NODE *createLambdaTableNode(char *type, char *id, SYMBOL_TABLE_NODE *args, AST_NODE *node);
+
 AST_NODE *assignSymbolTable(SYMBOL_TABLE_NODE *record, AST_NODE *node);
 
 SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *newNode, SYMBOL_TABLE_NODE *head);
 
 AST_NODE *addOperandToList(AST_NODE *newHead, AST_NODE *list);
+
+SYMBOL_TABLE_NODE *addArgToList(char *id, SYMBOL_TABLE_NODE *list);
 
 AST_NODE *decideConditional(AST_NODE *condition, AST_NODE *sExpr1, AST_NODE *sExpr2);
 
@@ -217,6 +224,7 @@ RET_VAL hypotTailRecursion(double st, AST_NODE *oplist);
 
 void freeSymbolTableRecursive(SYMBOL_TABLE_NODE *tnode);
 
+RET_VAL customFunction_op(AST_NODE *node);
 
 // Validates input token, returning type and value for valid token, otherwise nan
 RET_VAL validateToken(char *token);

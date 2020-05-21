@@ -8,12 +8,12 @@ and output are as current as the most recent task completion.
 #### Task 1 ::= CPN Calculator 
 This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for 
 the grammar of a lisp like language for evaluating expressions in CNP form, that is as an n-tuple, first element is an 
-operation, subsequent elements are operands. Further functionality will be added in subsequent tasks.    
+operation, subsequent elements are operands. Further functionality will be added.     
 ---
 #### Task 2 ::= CPN Calculator featuring Symbols  
 This task required adding to both the flex and bison files. Symbols must be composed of one or more alphabetical characters. 
-No other characters are allowed. Assignment is dane by the let expression. The key word `let` signifies the following ordered 
-pairs `(Symbol s_expr)` is semantically equivelant to `Symbol = s_expr`.    
+No other characters are allowed. Assignment is done by the let expression. The key word `let` signifies the following ordered 
+pairs `(Symbol s_expr)` is semantically equivalent to `Symbol = s_expr`.    
 ---
 #### Task 3 ::= CPN Calculator with Symbols featuring Symbol Casting  
 This task added the ability to cast a symbol value to int or double, regardless of what the symbol node evaluates to. 
@@ -26,8 +26,13 @@ for conditionals in the lex and yacc files.
 
 ---
 
-   
-##_Noteable_:  
+#### Task 5 ::= CPN Calculator with Symbol Casting, Conditionals, and User Defined Functions
+This was a much more difficult task. Now let expressions can include custom function definitions. There is an argument
+list, and the function definition is an s_expr.
+
+---  
+
+##_Notable_:  
 * The expression `(123)` was invalid for task 1, but is valid from task 2 forward.  
 * All input tested is collected in two files, `allBadInput.ciLisp` and `allValidInput.ciLisp` found in `inputs/`  
 
@@ -84,6 +89,11 @@ until the comparison returned true, and found that this implementation, on my de
 number of zeroes that follow the decimal, preceding the last 1, is 322. That is, at least 322 zeroes and a 1 after the decimal is 
 considered 0 and when compared to 0 with `equal` operator will evaluate to true.
 - Any instruction containing a read function is always executed from stdin, and is never redirected from a file.  
+---
+#### Task 5
+- I am not sure if the production s_expr->(SYMBOL s_exprlist) was the right idea. I am not sure if I am going to be able
+to complete this entire task, so debugging may be limited. This is an area I think needs focus.
+  
 ---
 
 # Sample Runs 
@@ -762,7 +772,18 @@ instructions that I hadn't already tried.
 
 ---
 ## Task 5
-###Run 1 : valid input  
+### Run 1 : valid input  
+At this point I am still trying to complete the evaluation code. It compiles only for the singe instruction I have been
+testing it on.  
+Input : `( ( let ( int funcName lambda ( abc ) (neg abc)) ) (funcName 3) )`
+### Run1 : output  
+```
+This error is in evalFuncNode()
+INTEGER : nan
+
+Process finished with exit code 0
+
+```
 
 ###Run 1 : output
 
