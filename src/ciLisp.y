@@ -62,6 +62,11 @@ s_expr:
     $$ = createSymbolNode($1);
     }
     |
+    LPAREN SYMBOL s_expr_list RPAREN{
+    	ylog(s_expr, LPAREN SYMBOL s_expr_list RPAREN);
+        $$ = createFunctionNode($2, $3);
+        }
+    |
     LPAREN let_section s_expr RPAREN {
     ylog(s_expr,LPAR let_section s_expr RPAR );
     $$ = assignSymbolTable($2, $3);
