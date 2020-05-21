@@ -823,24 +823,30 @@ SYMBOL_TABLE_NODE *addRecordToList(SYMBOL_TABLE_NODE *list, SYMBOL_TABLE_NODE *n
 // Receives a string from SYMBOL token and creates an AST node
 // pointing *value at the argument node
 SYMBOL_TABLE_NODE *createSymbolTableNode(char *type, char *id, AST_NODE *node) {
+    // First create a number node
     SYMBOL_TABLE_NODE *tnode;
     size_t nodeSize;
     AST_NODE *numberNode = (AST_NODE *) calloc(1, sizeof(AST_NODE));
     numberNode->type = NUM_NODE_TYPE;
+    // Evaluate the node and assign to number struct
     numberNode->data.number = eval(node);
+    // Free no longer needed node
     freeNode(node);
     nodeSize = sizeof(SYMBOL_TABLE_NODE);
+    // Create tablenode
     if ((tnode = calloc(nodeSize, 1)) == NULL)
         yyerror("Memory allocation failed!");
-
+    // Check if type cast, assign proper type
     if (type == NULL) {
         tnode->type = NO_TYPE;
     } else {
         tnode->type = (strcmp(type, typeNames[INT_TYPE]) == 0) ? INT_TYPE : DOUBLE_TYPE;
     }
-
+    // Symbol table node now has an id, and points to a number node
     tnode->id = id;
     tnode->value = numberNode;
+    // Assign appropriate symbol type (in this case variable)
+    tnode->symbolType = VAR_TYPE;
 
     return tnode;
 }

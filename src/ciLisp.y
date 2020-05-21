@@ -12,7 +12,7 @@
 
 %token <sval> FUNC SYMBOL TYPE
 %token <dval> INT DOUBLE
-%token LPAREN RPAREN EOL QUIT EOFT LET COND
+%token LPAREN RPAREN EOL QUIT EOFT LET COND LAMBDA
 
 %type <stNode> let_section let_list let_elem
 %type <astNode> s_expr f_expr number s_expr_list
@@ -103,6 +103,18 @@ s_expr_list:
     	$$ = NULL;
     };
 
+arg_list:
+	SYMBOL {
+	ylog(arg_list, SYMBOL);
+	// Need to do stuff
+
+	}
+	|
+	SYMBOL arg_list{
+	ylog(arg_list, SYMBOL arg_list);
+	// Need to do stuff
+	}
+
 let_section:
 	LPAREN LET let_list RPAREN {
 	ylog(let_section, LPAR LET let_list RPAR);
@@ -134,7 +146,18 @@ let_elem:
         ylog(let_elem, LPAR SYMBOL s_expr RPAR);
         $$ = createSymbolTableNode($2, $3, $4);
         }
+        |
+        LPAREN SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN {
+	ylog(let_elem, LPAREN SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN);
+	//Need to do
 
+	}
+	|
+	LPAREN TYPE SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN {
+	ylog(let_elem, LPAREN TYPE SYMBOL LAMBDA LPAREN arg_list RPAREN s_expr RPAREN);
+	//Need to do
+
+	}
 number:
     INT {
 	ylog(number, INT);

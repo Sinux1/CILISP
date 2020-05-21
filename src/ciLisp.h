@@ -119,15 +119,25 @@ typedef struct ast_node {
     struct ast_node *next;
 } AST_NODE;
 
+typedef enum {
+    VAR_TYPE,
+    LAMBDA_TYPE,
+    ARG_TYPE
+} SYMBOL_TYPE;
 
 typedef struct symbol_table_node {
     NUM_TYPE type;
     char *id;
     AST_NODE *value;
-    // SYMBOL_TYPE symbolType;
+    SYMBOL_TYPE symbolType;
+    struct stack_node *stack;
     struct symbol_table_node *next;
 } SYMBOL_TABLE_NODE;
 
+typedef struct stack_node {
+    RET_VAL value;
+    struct stack_node *next;
+} STACK_NODE;
 
 AST_NODE *createNumberNode(double value, NUM_TYPE type);
 

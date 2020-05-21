@@ -12,6 +12,7 @@ digit [0-9]
 int [+-]?{digit}+
 dbl [+-]?{digit}+\.{digit}+
 let "let"
+lambda "lambda"
 type "int"|"double"
 cond "cond"
 func "neg"|"abs"|"add"|"sub"|"mult"|"div"|"remainder"|"exp"|"exp2"|"pow"|"log"|"sqrt"|"cbrt"|"hypot"|"max"|"min"|"print"|"read"|"equal"|"less"|"greater"|"rand"|"equal"|"less"|"greater"
@@ -46,6 +47,11 @@ sym [a-zA-Z]+
 {let} {
     llog(LET);
     return LET;
+}
+
+{lambda} {
+    llog(lambda);
+    return LAMBDA;
 }
 
 {cond} {
