@@ -375,12 +375,12 @@ void freeNode(AST_NODE *node) {
     if (node->next != NULL) {
         freeNode(node->next);
     }
-
     if (node->symbolTable != NULL) {
         freeSymbolTableRecursive(node->symbolTable);
     }
+    if(node->arglist != NULL)
+        freeSymbolTableRecursive(node->arglist);
 
-    // TODO:
     // if the node is a function node:
     if (node->type == FUNC_NODE_TYPE) {
         // make a recursive call to free its opList if not NULL
@@ -1022,6 +1022,9 @@ RET_VAL validateToken(char *token) {
 void freeSymbolTableRecursive(SYMBOL_TABLE_NODE *tnode) {
     if (tnode->next != NULL) {
         freeSymbolTableRecursive(tnode->next);
+    }
+    if (tnode->stack != NULL) {
+        free(tnode->stack);
     }
     freeNode(tnode->value);
     free(tnode->id);

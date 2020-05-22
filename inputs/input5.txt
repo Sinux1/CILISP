@@ -1,1 +1,4 @@
-( ( let ( int funcName lambda ( abc ) (neg abc)) ) (funcName 3) )
+( ( let ( int funcName lambda ( abc ) (neg abc)) ) (funcName 3.0) )
+( ( let ( int funcName lambda ( abc ) (neg abc)) (int another lambda (a) (add 1 a) )) (funcName 3.0) )
+( ( let ( int funcName lambda ( abc ) (neg abc)) (int another lambda (a) (add 1 a) )) (funcName (( let ( int this lambda ( bac ) (neg bac)) (int that lambda (at) (add 1 at) )) (this (that 67)) ) ))
+

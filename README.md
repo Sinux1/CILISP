@@ -28,7 +28,8 @@ for conditionals in the lex and yacc files.
 
 #### Task 5 ::= CPN Calculator with Symbol Casting, Conditionals, and User Defined Functions
 This was a much more difficult task. Now let expressions can include custom function definitions. There is an argument
-list, and the function definition is an s_expr.
+list, and the function definition is an s_expr. Unfornatly, I am unable to complete Task 5. Task 5's custom function features
+_do_ _not_ _compute_ _correctly._
 
 ---  
 
@@ -91,8 +92,10 @@ considered 0 and when compared to 0 with `equal` operator will evaluate to true.
 - Any instruction containing a read function is always executed from stdin, and is never redirected from a file.  
 ---
 #### Task 5
-- I am not sure if the production s_expr->(SYMBOL s_exprlist) was the right idea. I am not sure if I am going to be able
-to complete this entire task, so debugging may be limited. This is an area I think needs focus.
+- I am unable to complete this task. I did complete the flex and bison files, and I completed enough so that when an 
+instruction using a custom function operation is executed, it compiles. When an instruction using a custom funtion is 
+input, a message from customFunction_op is orinted, and the default return value is displayed.
+
   
 ---
 
@@ -766,17 +769,21 @@ Process finished with exit code 0
 
 ```
 ### Run 4: invalid inputs     
-All invalid inputs from Tasks 1 - 3 were run again, and are shown above. I could not think of any unique invalid 
-instructions that I hadn't already tried.
+All invalid inputs from Tasks 1 - 3 were run again, and are listed under invalid runs for each task above. I could not 
+think of any unique invalid instructions that I hadn't already tried.
 
 
 ---
 ## Task 5
 ### Run 1 : valid input  
-At this point I am still trying to complete the evaluation code. It compiles only for the singe instruction I have been
-testing it on.  
-Input : `( ( let ( int funcName lambda ( abc ) (neg abc)) ) (funcName 3) )`
-### Run1 : output  
+I was only able to test three instructions, all found in `input5.txt`.
+```
+( ( let ( int funcName lambda ( abc ) (neg abc)) ) (funcName 3.0) )
+( ( let ( int funcName lambda ( abc ) (neg abc)) (int another lambda (a) (add 1 a) )) (funcName 3.0) )
+( ( let ( int funcName lambda ( abc ) (neg abc)) (int another lambda (a) (add 1 a) )) (funcName (( let ( int this lambda ( bac ) (neg bac)) (int that lambda (at) (add 1 at) )) (this (that 67)) ) ))
+
+```
+### Run 1 : output  
 ```
 This error is in evalFuncNode()
 INTEGER : nan
@@ -785,7 +792,412 @@ Process finished with exit code 0
 
 ```
 
-###Run 1 : output
+### Run 2 : all valid input from previous 4 tasks
+Confirming previous tasks are not broken, the file `allValidTestInputs.cilisp` contains all input from previous tasks.
+```
+(neg 5)
+
+(neg 5.5)
+(neg -5.0)
+(neg -5)
+(neg)
+(neg 1 2)
+(abs 1)
+(abs 1.2)
+(abs -3)
+(abs 0)
+(abs 0.0)
+(abs -1.4)
+(abs)
+(abs -1 2)
+(add)
+(add 1)
+(add 1.0)
+(add 1 2 3 4 5)
+(add 1 -2 3 -4 5 -6)
+(add 0.0 1 -2 3 -4 5 -6)
+(add 1 -1.0)
+(sub)
+(sub 1)
+(sub 1.0)
+(sub 1 2)
+(sub 2 1)
+(sub 2 -1)
+(sub 2.0 1)
+(sub 2.0 -1)
+(sub 1 1.0)
+(sub 2.0 1.0)
+(sub 1 2 3)
+(mult)
+(mult 1)
+(mult 1.0)
+(mult -1)
+(mult -1 -1.0)
+(mult 1 -2 3 -4 5)
+(mult -1.0 2 -3.0 4 -5)
+(div)
+(div 1)
+(div 1.0)
+(div 1 2)
+(div 1.0 2)
+(div 2 1)
+(div 2.0 1)
+(div 5 2.0)
+(div -20.0 4)
+(div 1 2 3 4)
+(div 1 2 3)
+(div 5.0 2 3)
+(div 20 0)
+(remainder)
+(remainder 1)
+(remainder 0)
+(remainder -1.0)
+(remainder 1 2)
+(remainder 2 1)
+(remainder 2.5 1)
+(remainder 2 3)
+(remainder -6 10)
+(remainder -6.0 10.0)
+(remainder -6.0 -10.0)
+(remainder 1 2 3)
+(remainder 23 7 10)
+(exp)
+(exp 1)
+(exp (log 1))
+(exp -1)
+(exp 5.0)
+(exp -2.0)
+(exp 1 2)
+(exp2)
+(exp2 1)
+(exp2 1.0)
+(exp2 0)
+(exp2 0.0)
+(exp2 0.5)
+(exp2 (div 1 2.0))
+(exp2 -2)
+(exp2 -2.0)
+(exp2 1 2)
+(pow)
+(pow 1)
+(pow 1.0)
+(pow 1 1)
+(pow 1 1.0)
+(pow 2 1)
+(pow 2.1 1)
+(pow -2 0.5)
+(pow -2 0)
+(pow -2.0 0.0)
+(pow -2.0 0)
+(pow 3 3)
+(pow 3.0 3)
+(pow 27 (div 1 3.0))
+(pow 1 2 3)
+(log)
+(log 1)
+(log 0)
+(log -1)
+(log 0.0)
+(log -1.0)
+(log (exp 1))
+(div (log 27) (log 3))
+(div (log 27.0) (log 3))
+(log 1 2)
+(sqrt)
+(sqrt 1)
+(sqrt 1.0)
+(sqrt 0)
+(sqrt 0.0)
+(sqrt -1)
+(sqrt -1.0)
+(sqrt 4)
+(sqrt 4.0)
+(sqrt 2)
+(sqrt 1 2)
+(cbrt)
+(cbrt 0)
+(cbrt 0.0)
+(cbrt -1)
+(cbrt -1.0)
+(cbrt 1)
+(cbrt 1.0)
+(cbrt 27)
+(cbrt           27.0)
+(cbrt 4)
+(cbrt (pow 3 3))
+(cbrt (pow 3 6))
+(cbrt 1 2)
+(hypot)
+(hypot 1)
+(hypot 1.0)
+(hypot 3 4)
+(hypot -3 4)
+(hypot -30 -40.0)
+(hypot 4 4 7)
+(hypot 7.0 4 4.0)
+(hypot 12 13 14)
+(hypot 5 5 5)
+(hypot -5 -5.0 (sqrt 25))
+(hypot 0 0 0.0 -3 0 0 0 0 4 0.0 -0.0 12)
+(max)
+(max 1)
+(max -1)
+(max 1.0)
+(max 	232311.121)
+(max 1 2 3 4 5 6 7 8.0 9)
+(max 1 2 25.0 -26.0 12)
+(min)
+(min 1)
+(min 0.0)
+(min 0)
+
+(min -1 2 -3 4 -5 6)
+(min                -1.0    -12.0   12)
+(log (exp (log (exp 1))))
+(sub (mult 1 2 3 4) (add 1 2 3 4))
+(sub (mult 1 2 3 -4.0) (add -1 -2 -3 -4))
+(hypot (sqrt (div 100 7.0)) (mult 6 (sqrt (div 100.0 7))))
+(       hypot (sqrt (div 100 7.0)) (sqrt (mult 6 (div           100.0 7))))
+(add 1      (add              2 (add 3 (add 4 (add 5 (add 6 (add 7)))))))
+(add 1 (add     2 (add 3 (add 4 (add 5 (add 6 (sub 0 -7.0)))))))
+(mult 1 (sub))
+(sub 2 1 (add 1))
+( (let (x 1) ) x )
+(add ((let (abc 1)) (sub 3 abc)) 4)
+(mult ((let (a 1) (b 2)) (add a b)) (sqrt 2))
+(add ((let (a ((let (b 2)) (mult b (sqrt 10))))) (div a 2)) ((let (c 5)) (sqrt c)))
+((let (first (sub 5 1)) (second 2)) (add (pow 2 first) (sqrt second)))
+((let (abc 1)) (sub ((let (abc 2) (de 3)) (add abc de)) abc))
+((let (x 3) (x 30)) (add ((let (x 10) (x 100)) x) x))
+((let (abc 1)) (sub ((let (abc 2)) (add abc de)) abc))
+QUIT
+quit
+```
+
+### Run 2 : output
+```
+INTEGER : -5
+DOUBLE: -5.500000
+DOUBLE: 5.000000
+INTEGER : 5
+ERROR: neg called with no operands!
+INTEGER : nan
+WARNING: neg called with extra (ignored) operands!
+INTEGER : -1
+INTEGER : 1
+DOUBLE: 1.200000
+INTEGER : 3
+INTEGER : 0
+DOUBLE: 0.000000
+DOUBLE: 1.400000
+ERROR: abs called with no args.
+INTEGER : nan
+WARNING: abs call with extra operands. Only first operand used!
+INTEGER : 1
+WARNING: add call with no operands, 0 returned!
+INTEGER : 0
+INTEGER : 1
+DOUBLE: 1.000000
+INTEGER : 15
+INTEGER : -3
+DOUBLE: -3.000000
+DOUBLE: 0.000000
+ERROR: sub called with no operands!
+INTEGER : nan
+ERROR: sub called with only one arg!
+INTEGER : nan
+ERROR: sub called with only one arg!
+INTEGER : nan
+INTEGER : -1
+INTEGER : 1
+INTEGER : 3
+DOUBLE: 1.000000
+DOUBLE: 3.000000
+DOUBLE: 0.000000
+DOUBLE: 1.000000
+WARNING: sub called with extra (ignored) operands!
+INTEGER : -1
+WARNING: mult call with no operands, 1 returned!
+INTEGER : 1
+INTEGER : 1
+DOUBLE: 1.000000
+INTEGER : -1
+DOUBLE: 1.000000
+INTEGER : 120
+DOUBLE: -120.000000
+ERROR: div called with no operands!
+INTEGER : nan
+ERROR: div called with only one arg!
+INTEGER : nan
+ERROR: div called with only one arg!
+INTEGER : nan
+INTEGER : 0
+DOUBLE: 0.500000
+INTEGER : 2
+DOUBLE: 2.000000
+DOUBLE: 2.500000
+DOUBLE: -5.000000
+WARNING: div called with extra (ignored) operands!
+INTEGER : 0
+WARNING: div called with extra (ignored) operands!
+INTEGER : 0
+WARNING: div called with extra (ignored) operands!
+DOUBLE: 2.500000
+Division by zero error
+INTEGER : nan
+ERROR: remainder called with no operands!
+INTEGER : nan
+ERROR: remainder called with only one arg!
+INTEGER : nan
+ERROR: remainder called with only one arg!
+INTEGER : nan
+ERROR: remainder called with only one arg!
+INTEGER : nan
+INTEGER : 1
+INTEGER : 0
+DOUBLE: 0.500000
+INTEGER : 2
+INTEGER : 4
+DOUBLE: 4.000000
+DOUBLE: 4.000000
+WARNING: remainder called with extra (ignored) operands!
+INTEGER : 1
+WARNING: remainder called with extra (ignored) operands!
+INTEGER : 2
+ERROR: exp called with no operands!
+INTEGER : nan
+DOUBLE: 2.718282
+DOUBLE: 1.000000
+DOUBLE: 0.367879
+DOUBLE: 148.413159
+DOUBLE: 0.135335
+WARNING: exp called with extra (ignored) operands!
+DOUBLE: 2.718282
+ERROR: exp2 called with no operands!
+INTEGER : nan
+INTEGER : 2
+DOUBLE: 2.000000
+INTEGER : 1
+DOUBLE: 1.000000
+DOUBLE: 1.414214
+DOUBLE: 1.414214
+DOUBLE: 0.250000
+DOUBLE: 0.250000
+WARNING: exp2 called with extra (ignored) operands!
+INTEGER : 2
+ERROR: pow called with no operands!
+INTEGER : nan
+ERROR: pow called with only one arg!
+INTEGER : nan
+ERROR: pow called with only one arg!
+INTEGER : nan
+INTEGER : 1
+DOUBLE: 1.000000
+INTEGER : 2
+DOUBLE: 2.100000
+INTEGER : nan
+INTEGER : 1
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+INTEGER : 27
+DOUBLE: 27.000000
+DOUBLE: 3.000000
+WARNING: pow called with extra (ignored) operands!
+INTEGER : 1
+ERROR: log called with no operands!
+INTEGER : nan
+DOUBLE: 0.000000
+DOUBLE: -inf
+INTEGER : nan
+DOUBLE: -inf
+INTEGER : nan
+DOUBLE: 1.000000
+DOUBLE: 3.000000
+DOUBLE: 3.000000
+WARNING: log called with extra (ignored) operands!
+DOUBLE: 0.000000
+ERROR: sqrt called with no operands!
+INTEGER : nan
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+DOUBLE: 0.000000
+DOUBLE: 0.000000
+INTEGER : nan
+INTEGER : nan
+DOUBLE: 2.000000
+DOUBLE: 2.000000
+DOUBLE: 1.414214
+WARNING: sqrt called with extra (ignored) operands!
+DOUBLE: 1.000000
+ERROR: cbrt called with no operands!
+INTEGER : nan
+DOUBLE: 0.000000
+DOUBLE: 0.000000
+DOUBLE: -1.000000
+DOUBLE: -1.000000
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+DOUBLE: 3.000000
+DOUBLE: 3.000000
+DOUBLE: 1.587401
+DOUBLE: 3.000000
+DOUBLE: 9.000000
+WARNING: cbrt called with extra (ignored) operands!
+DOUBLE: 1.000000
+ERROR: hypot called with no operands, 0.0 returned!
+DOUBLE: 0.000000
+DOUBLE: 1.000000
+DOUBLE: 1.000000
+DOUBLE: 5.000000
+DOUBLE: 5.000000
+DOUBLE: 50.000000
+DOUBLE: 9.000000
+DOUBLE: 9.000000
+DOUBLE: 22.561028
+DOUBLE: 8.660254
+DOUBLE: 8.660254
+DOUBLE: 13.000000
+ERROR: max called with no operands!
+INTEGER : nan
+INTEGER : 1
+INTEGER : -1
+DOUBLE: 1.000000
+DOUBLE: 232311.121000
+INTEGER : 9
+DOUBLE: 25.000000
+ERROR: min called with no operands!
+INTEGER : nan
+INTEGER : 1
+DOUBLE: 0.000000
+INTEGER : 0
+INTEGER : -5
+DOUBLE: -12.000000
+DOUBLE: 1.000000
+INTEGER : 14
+DOUBLE: -14.000000
+DOUBLE: 22.990681
+DOUBLE: 10.000000
+INTEGER : 28
+DOUBLE: 28.000000
+ERROR: sub called with no operands!
+INTEGER : nan
+WARNING: sub called with extra (ignored) operands!
+INTEGER : 1
+INTEGER : 1
+INTEGER : 6
+DOUBLE: 4.242641
+DOUBLE: 5.398346
+DOUBLE: 17.414214
+INTEGER : 4
+INTEGER : 130
+Undefined Symbol!
+INTEGER : nan
+Undefined Symbol!
+INTEGER : nan
+
+Process finished with exit code 0
+
+```
 
 --- 
 
@@ -793,5 +1205,7 @@ Process finished with exit code 0
 - Instructions from file (when stdin is redirected with freopen) are not echoed to console. 
 - The read function can only be called from stdin without redirection with freopen. Any attempt to use read from input 
 file will result in undefined behavior.
-
+- Task 5 is not complete, and any input that includes cusotm function operations will produce _undefined behavior._
+- There are two leaks when `inout5.txt` is run. They are located in a file I did not write. I know it is from a mistake
+I made, but I cannot find it.
 --- 
