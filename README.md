@@ -5,11 +5,14 @@ This is an interpreter for a lisp-like language. Functionality was added a task 
 "abs", "add", "sub", "mult", "div", "remainder", "exp","exp2","pow",  "log", "sqrt", "cbrt", "hypot", "max", "min", 
 "print", "read", "rand", "equal", "less" and "greater", the ability to use symbols (variables), cast symbols to int or 
 double type, and conditional statements.  All test runs and output are included for each task in Sample Runs. Sample runs 
-and output are as current as the most recent task completion. 
-#### Task 1 ::= CPN Calculator 
+and output are as current as the most recent task completion.  
+
+#### Task 1 ::= CPN Calculator
+
 This is the first task. It required completing both the lex and yacc files, as well as eval and math op functions for 
 the grammar of a lisp like language for evaluating expressions in CNP form, that is as an n-tuple, first element is an 
-operation, subsequent elements are operands. Further functionality will be added.     
+operation, subsequent elements are operands. Further functionality will be added.  
+
 ---
 
 #### Task 2 ::= CPN Calculator featuring Symbols
@@ -17,6 +20,7 @@ operation, subsequent elements are operands. Further functionality will be added
 This task required adding to both the flex and bison files. Symbols must be composed of one or more alphabetical characters. 
 No other characters are allowed. Assignment is done by the let expression. The key word `let` signifies the following ordered 
 pairs `(Symbol s_expr)` is semantically equivalent to `Symbol = s_expr`.    
+
 ---
 
 #### Task 3 ::= CPN Calculator with Symbols featuring Symbol Casting
@@ -24,6 +28,7 @@ pairs `(Symbol s_expr)` is semantically equivalent to `Symbol = s_expr`.
 This task added the ability to cast a symbol value to int or double, regardless of what the symbol node evaluates to. 
 This required an additional production to `let_section` in yacc file, and the addition of key words `int` and `double` in 
 the lex file. 
+
 ---
 
 #### Task 4 ::= CPN Calculator with Symbol Casting featuring Conditionals and Additional Functions
@@ -97,6 +102,7 @@ table node is evaluated and returned.
 
 - There is now a warning for invalid characters per sample run example.    
 - Very little was changed from task 2 to task 3, so bad inputs for testing task 3 functionality are minimal.  
+
 ---
 
 #### Task 4
@@ -106,6 +112,7 @@ until the comparison returned true, and found that this implementation, on my de
 number of zeroes that follow the decimal, preceding the last 1, is 322. That is, at least 322 zeroes and a 1 after the decimal is 
 considered 0 and when compared to 0 with `equal` operator will evaluate to true.
 - Any instruction containing a read function is always executed from stdin, and is never redirected from a file.  
+
 ---
 
 #### Task 5
