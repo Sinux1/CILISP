@@ -1,5 +1,6 @@
 # CiLisp
-## Summary  
+## Summary
+
 This is an interpreter for a lisp-like language. Functionality was added a task at a time. Basic features include "neg", 
 "abs", "add", "sub", "mult", "div", "remainder", "exp","exp2","pow",  "log", "sqrt", "cbrt", "hypot", "max", "min", 
 "print", "read", "rand", "equal", "less" and "greater", the ability to use symbols (variables), cast symbols to int or 
@@ -10,34 +11,43 @@ This is the first task. It required completing both the lex and yacc files, as w
 the grammar of a lisp like language for evaluating expressions in CNP form, that is as an n-tuple, first element is an 
 operation, subsequent elements are operands. Further functionality will be added.     
 ---
-#### Task 2 ::= CPN Calculator featuring Symbols  
+
+#### Task 2 ::= CPN Calculator featuring Symbols
+
 This task required adding to both the flex and bison files. Symbols must be composed of one or more alphabetical characters. 
 No other characters are allowed. Assignment is done by the let expression. The key word `let` signifies the following ordered 
 pairs `(Symbol s_expr)` is semantically equivalent to `Symbol = s_expr`.    
 ---
-#### Task 3 ::= CPN Calculator with Symbols featuring Symbol Casting  
+
+#### Task 3 ::= CPN Calculator with Symbols featuring Symbol Casting
+
 This task added the ability to cast a symbol value to int or double, regardless of what the symbol node evaluates to. 
 This required an additional production to `let_section` in yacc file, and the addition of key words `int` and `double` in 
 the lex file. 
 ---
-#### Task 4 ::= CPN Calculator with Symbol Casting featuring Conditionals and Additional Functions  
+
+#### Task 4 ::= CPN Calculator with Symbol Casting featuring Conditionals and Additional Functions
+
 This requires the definition of additional functions to CPN calculator, and additional productions and key words 
 for conditionals in the lex and yacc files.
 
 ---
 
 #### Task 5 ::= CPN Calculator with Symbol Casting, Conditionals, and User Defined Functions
+
 This was a much more difficult task. Now let expressions can include custom function definitions. There is an argument
 list, and the function definition is an s_expr. Unfornatly, I am unable to complete Task 5. Task 5's custom function features
 _do_ _not_ _compute_ _correctly._
 
 ---  
 
-##_Notable_:  
+##_Notable_:
+
 * The expression `(123)` was invalid for task 1, but is valid from task 2 forward.  
 * All input tested is collected in two files, `allBadInput.ciLisp` and `allValidInput.ciLisp` found in `inputs/`  
 
-#### Task 1 
+#### Task 1
+
 - I had to add a production for _s_expr_list_ to handle the instance when no operand is provided. 
 - A production was added to _program_ for the case when there is no instruction. In an input file, this is represented by 
 a blank line.    
@@ -52,7 +62,9 @@ was no explicit instruction for divide by zero error in function implementation 
 and tested through all tasks in this lab.  
 
 ---
+
 #### Task 2
+
 * The underlying data structure of an AST node was added to. In task 1, each AST node had a `type`, `*data`, and `*next` 
 values. This allowed them to be used as linked lists, and when evaluating an AST node, all of the information for that 
 evaluation could be found in the data pointed to by the `data` pointer and the value of `type`. Now in this task, the AST 
@@ -80,18 +92,24 @@ table of it's parent node. This is continued until a match is found or `parent` 
 table node is evaluated and returned.  
 
 ---    
-#### Task 3  
+
+#### Task 3
+
 - There is now a warning for invalid characters per sample run example.    
 - Very little was changed from task 2 to task 3, so bad inputs for testing task 3 functionality are minimal.  
 ---
+
 #### Task 4
+
 - I tested the precision of the equal operation by comparing 0 to 0.000...1 with increasing number of decimal digits 
 until the comparison returned true, and found that this implementation, on my development PC, will return true once the 
 number of zeroes that follow the decimal, preceding the last 1, is 322. That is, at least 322 zeroes and a 1 after the decimal is 
 considered 0 and when compared to 0 with `equal` operator will evaluate to true.
 - Any instruction containing a read function is always executed from stdin, and is never redirected from a file.  
 ---
+
 #### Task 5
+
 - I am unable to complete this task. I did complete the flex and bison files, and I completed enough so that when an 
 instruction using a custom function operation is executed, it compiles. When an instruction using a custom funtion is 
 input, a message from customFunction_op is orinted, and the default return value is displayed.
@@ -99,9 +117,12 @@ input, a message from customFunction_op is orinted, and the default return value
   
 ---
 
-# Sample Runs 
-## Task 1   
-### Run 1 : valid input 
+# Sample Runs
+
+## Task 1
+
+### Run 1 : valid input
+
 Input in `/inputs/input1.txt` was collected from Task 1 example sample runs and includes other inputs that I wanted to 
 test to make sure things like whitespace were correctly ignored, and that when nested functions threw an error, the rest 
 of the function completed correctly. Such as when a call to sub with no operands was nested deep in other functions, the 
@@ -489,7 +510,9 @@ INTEGER : 1
 Process finished with exit code 0
 ```
 ---
+
 ### Run 2 : invalid inputs
+
 Input in `/inputs/badinput1.txt` are instructions I tested that I knew to be invalid, and were all correctly rejected.  
 ```
 ()
@@ -500,7 +523,9 @@ add 12 12
 (func 2 3)
 (123)
 ```
+
 ### Run 2 : output
+
 Each invalid input correctly threw this error.  
 ```
 
@@ -509,9 +534,12 @@ ERROR: syntax error
 Process finished with exit code 1
 
 ```
----  
+---
+
 ## Task 2
+
 ### Run 1: valid input
+
 Input in `/inputs/input2.txt` was collected from Task 1 example sample runs and includes other expressions to test various 
 nestings and to be sure that the symbol tables and parent nodes were implemented correctly programmatically. For example, 
 when evaluating a symbol node, the value of the most recent definition is used, or the successful evaluation of a 
@@ -536,7 +564,9 @@ quit
 
 
 ```
+
 ### Run 1: output
+
 ```
 INTEGER : 1
 INTEGER : 6
@@ -557,7 +587,9 @@ INTEGER : nan
 
 Process finished with exit code 0
 ```
+
 ### Run 2: invalid input
+
 Input in `/inputs/badinput2.txt` are instructions I tested that I knew to be invalid, and were all correctly rejected.  
 ```
 ((let (x 1)) (add y ((let (y 1)) x)))
@@ -568,7 +600,9 @@ Input in `/inputs/badinput2.txt` are instructions I tested that I knew to be inv
 (((((((1)))))))
 (2 3)
 ```
+
 ### Run 2: output
+
 Each invalid input correctly threw this error.  
 ```
 
@@ -578,8 +612,11 @@ Process finished with exit code 1
 
 ```
 ---
-## Task 3  
-### Run 1 : valid input  
+
+## Task 3
+
+### Run 1 : valid input
+
 Input from `../inputs/validInput3.txt` is pulled from the sample runs in the task instructions, and from task 2 valid 
 input, except modified by adding a cast to at least one let_elem in every instruction. All output is valid.  
 ``` 
@@ -603,7 +640,9 @@ QUIT
 (add ((let (double x 1)) x) ((let (y 10)) x))
 quit
 ```
-### Run 1: output  
+
+### Run 1: output
+
 ```
 WARNING: precision loss on int cast from 1.25 to 1 for variable a.
 INTEGER : 2
@@ -631,9 +670,12 @@ INTEGER : nan
 Undefined Symbol!
 INTEGER : nan
 
-``` 
+```
+
 ## Task 4
+
 ### Run 1 : valid input
+
 Input file `../inputs/input4.txt` begins with several calls to rand to test correct seeding of rand function, and it 
 contains all sample runs as well as additional instructions crafted to test proper functionality of more complicated 
 instructions, such as `(add ((let (x 1) (y (cond 1 (print 1 2 3 (rand)) (print (rand)) ) ) ) y ) 1)`, which is an 
@@ -732,7 +774,9 @@ INTEGER : 111
 Process finished with exit code 0
 
 ```
+
 ### Run 2 : valid read instructions
+
 The following instructions and outputs are the result of manually typing them into the terminal, and can be found in 
 `/inputs/validReadInstructions.txt`.
 ```
@@ -768,14 +812,19 @@ quit
 Process finished with exit code 0
 
 ```
-### Run 4: invalid inputs     
+
+### Run 4: invalid inputs
+
 All invalid inputs from Tasks 1 - 3 were run again, and are listed under invalid runs for each task above. I could not 
 think of any unique invalid instructions that I hadn't already tried.
 
 
 ---
+
 ## Task 5
-### Run 1 : valid input  
+
+### Run 1 : valid input
+
 I was only able to test three instructions, all found in `input5.txt`.
 ```
 ( ( let ( int funcName lambda ( abc ) (neg abc)) ) (funcName 3.0) )
@@ -783,7 +832,9 @@ I was only able to test three instructions, all found in `input5.txt`.
 ( ( let ( int funcName lambda ( abc ) (neg abc)) (int another lambda (a) (add 1 a) )) (funcName (( let ( int this lambda ( bac ) (neg bac)) (int that lambda (at) (add 1 at) )) (this (that 67)) ) ))
 
 ```
-### Run 1 : output  
+
+### Run 1 : output
+
 ```
 This error is in evalFuncNode()
 INTEGER : nan
@@ -793,6 +844,7 @@ Process finished with exit code 0
 ```
 
 ### Run 2 : all valid input from previous 4 tasks
+
 Confirming previous tasks are not broken, the file `allValidTestInputs.cilisp` contains all input from previous tasks.
 ```
 (neg 5)
@@ -975,6 +1027,7 @@ quit
 ```
 
 ### Run 2 : output
+
 ```
 INTEGER : -5
 DOUBLE: -5.500000
@@ -1201,7 +1254,8 @@ Process finished with exit code 0
 
 --- 
 
-# Known Bugs 
+# Known Bugs
+
 - Instructions from file (when stdin is redirected with freopen) are not echoed to console. 
 - The read function can only be called from stdin without redirection with freopen. Any attempt to use read from input 
 file will result in undefined behavior.
